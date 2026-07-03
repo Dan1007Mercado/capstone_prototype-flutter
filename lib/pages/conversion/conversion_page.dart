@@ -28,7 +28,6 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
     final isBusy = appState.surveyExtractionRunning || _isProcessing;
 
     return Scaffold(
-      
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -36,9 +35,9 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Upload questionnaire images or PDFs and start AI-powered extraction.',
-                  style: TextStyle(color: AppColors.textSecondary),
+                const SectionHeader(
+                  title: 'Survey Converter',
+                  subtitle: 'Upload questionnaire images or PDFs and start AI-powered extraction.',
                 ),
                 const SizedBox(height: 16),
                 Wrap(
@@ -47,12 +46,12 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
                   children: [
                     FilledButton.icon(
                       onPressed: _pickImages,
-                      icon: const Icon(Icons.photo_library_outlined),
+                      icon: const Icon(Icons.photo_library_outlined, size: 18),
                       label: const Text('Upload Images'),
                     ),
                     OutlinedButton.icon(
                       onPressed: _pickPdf,
-                      icon: const Icon(Icons.picture_as_pdf_outlined),
+                      icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
                       label: const Text('Upload PDF'),
                     ),
                   ],
@@ -86,31 +85,43 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
                     padding: const EdgeInsets.all(14),
                     margin: const EdgeInsets.only(bottom: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [
                         const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.4),
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             appState.surveyExtractionStatus,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         ),
                       ],
                     ),
                   ),
                 if (!hasFiles)
-                  const Text(
-                    'No files selected yet. Add one or more image files or a PDF to begin.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.folder_open_outlined, size: 48, color: AppColors.textDisabled),
+                          SizedBox(height: 12),
+                          Text(
+                            'No files selected yet. Add one or more image files or a PDF to begin.',
+                            style: TextStyle(color: AppColors.textSecondary),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   )
                 else ...[
                   Wrap(
@@ -136,17 +147,17 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: _pickImages,
-                        icon: const Icon(Icons.add_photo_alternate_outlined),
+                        icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
                         label: const Text('Add Images'),
                       ),
                       OutlinedButton.icon(
                         onPressed: _pickPdf,
-                        icon: const Icon(Icons.attach_file_outlined),
+                        icon: const Icon(Icons.attach_file_outlined, size: 18),
                         label: const Text('Add PDF'),
                       ),
                       FilledButton.icon(
                         onPressed: isBusy ? null : () => _proceed(appState),
-                        icon: const Icon(Icons.play_arrow_outlined),
+                        icon: const Icon(Icons.play_arrow_outlined, size: 18),
                         label: const Text('Proceed'),
                       ),
                     ],
@@ -329,11 +340,11 @@ class _ImageFileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 180,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.inputBorder),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,33 +353,37 @@ class _ImageFileCard extends StatelessWidget {
             height: 96,
             decoration: BoxDecoration(
               color: AppColors.inputBg,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: file.bytes != null
                 ? ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(12),
                     child: Image.memory(
                       file.bytes!,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
                       errorBuilder: (_, _, _) => const Center(
-                        child: Icon(Icons.image_outlined, color: AppColors.primary, size: 32),
+                        child: Icon(Icons.image_outlined, color: AppColors.primary, size: 28),
                       ),
                     ),
                   )
                 : const Center(
-                    child: Icon(Icons.image_outlined, color: AppColors.primary, size: 32),
+                    child: Icon(Icons.image_outlined, color: AppColors.primary, size: 28),
                   ),
           ),
           const SizedBox(height: 10),
-          Text(file.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 6),
+          Text(file.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          const SizedBox(height: 4),
           Text('Image source', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton(onPressed: onRemove, child: const Text('Remove')),
+            child: TextButton(
+              onPressed: onRemove,
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
+              child: const Text('Remove'),
+            ),
           ),
         ],
       ),
@@ -386,35 +401,35 @@ class _PdfFileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 220,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.inputBorder),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(14),
+              color: AppColors.primary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.picture_as_pdf_outlined, color: AppColors.primary),
+            child: const Icon(Icons.picture_as_pdf_outlined, color: AppColors.primary, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(file.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 4),
+                Text(file.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                const SizedBox(height: 3),
                 Text('PDF document', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
               ],
             ),
           ),
-          IconButton(onPressed: onRemove, icon: const Icon(Icons.close_outlined)),
+          IconButton(onPressed: onRemove, icon: const Icon(Icons.close_outlined, size: 18)),
         ],
       ),
     );

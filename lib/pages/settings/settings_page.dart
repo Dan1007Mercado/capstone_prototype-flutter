@@ -78,9 +78,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Manage your account information and preferences.',
-              style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.5,
+                  ),
             ),
             const SizedBox(height: 20),
             SurfaceCard(
@@ -90,11 +93,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   Row(
                     children: [
                       Container(
-                        width: 60,
-                        height: 60,
+                        width: 56,
+                        height: 56,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.divider),
                         ),
                         child: const Center(
                           child: Text(
@@ -102,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w800,
-                              fontSize: 22,
+                              fontSize: 20,
                             ),
                           ),
                         ),
@@ -111,19 +115,21 @@ class _SettingsPageState extends State<SettingsPage> {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Daniel Mercado', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                            SizedBox(height: 4),
+                          children: [
+                            const Text('Daniel Mercado', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 3),
                             Text(
                               'Premium User • dmercado@talanscan.local',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const Divider(height: 32, color: AppColors.inputBorder),
+                  const Divider(height: 32, color: AppColors.divider),
                   Form(
                     key: _profileFormKey,
                     child: Column(
@@ -133,7 +139,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             Expanded(
                               child: TextFormField(
                                 controller: _firstNameController,
-                                decoration: const InputDecoration(labelText: 'First Name'),
+                                decoration: const InputDecoration(
+                                  labelText: 'First Name',
+                                  prefixIcon: Icon(Icons.person_outline, size: 20),
+                                ),
                                 validator: (value) => value == null || value.isEmpty ? 'Required' : null,
                               ),
                             ),
@@ -141,26 +150,35 @@ class _SettingsPageState extends State<SettingsPage> {
                             Expanded(
                               child: TextFormField(
                                 controller: _lastNameController,
-                                decoration: const InputDecoration(labelText: 'Last Name'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Last Name',
+                                  prefixIcon: Icon(Icons.person_outline, size: 20),
+                                ),
                                 validator: (value) => value == null || value.isEmpty ? 'Required' : null,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
                         TextFormField(
                           controller: _emailController,
-                          decoration: const InputDecoration(labelText: 'Email Address'),
+                          decoration: const InputDecoration(
+                            labelText: 'Email Address',
+                            prefixIcon: Icon(Icons.email_outlined, size: 20),
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) return 'Required';
                             if (!value.contains('@')) return 'Enter a valid email';
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
                         TextFormField(
                           controller: _phoneController,
-                          decoration: const InputDecoration(labelText: 'Phone Number'),
+                          decoration: const InputDecoration(
+                            labelText: 'Phone Number',
+                            prefixIcon: Icon(Icons.phone_outlined, size: 20),
+                          ),
                         ),
                         const SizedBox(height: 22),
                         Row(
@@ -199,9 +217,14 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Password & Security', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 14),
-                  const Text('Last changed 90 days ago', style: TextStyle(color: AppColors.textSecondary)),
+                  const Text('Password & Security', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Last changed 90 days ago',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                  ),
                   const SizedBox(height: 20),
                   FilledButton.icon(
                     onPressed: () {
@@ -209,7 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SnackBar(content: Text('Change password flow is a placeholder.')),
                       );
                     },
-                    icon: const Icon(Icons.key_outlined),
+                    icon: const Icon(Icons.key_outlined, size: 18),
                     label: const Text('Change Password'),
                   ),
                 ],
@@ -220,11 +243,13 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Two-Factor Authentication', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Text('Two-Factor Authentication', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Enhance your account security with 2FA.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                   ),
                   const SizedBox(height: 20),
                   FilledButton.icon(
@@ -233,7 +258,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SnackBar(content: Text('2FA setup is a placeholder.')),
                       );
                     },
-                    icon: const Icon(Icons.shield_outlined),
+                    icon: const Icon(Icons.shield_outlined, size: 18),
                     label: const Text('Enable 2FA'),
                   ),
                 ],
@@ -252,13 +277,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       TextFormField(
                         controller: _conversionThresholdController,
-                        decoration: const InputDecoration(labelText: 'Confidence Threshold (%)'),
+                        decoration: const InputDecoration(
+                          labelText: 'Confidence Threshold (%)',
+                          prefixIcon: Icon(Icons.tune_outlined, size: 20),
+                        ),
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _autoReviewConfidenceController,
-                        decoration: const InputDecoration(labelText: 'Auto-Review Confidence'),
+                        decoration: const InputDecoration(
+                          labelText: 'Auto-Review Confidence',
+                          prefixIcon: Icon(Icons.auto_awesome_outlined, size: 20),
+                        ),
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 14),
@@ -316,7 +347,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       TextFormField(
                         controller: _retentionController,
-                        decoration: const InputDecoration(labelText: 'Data Retention Period (days)'),
+                        decoration: const InputDecoration(
+                          labelText: 'Data Retention Period (days)',
+                          prefixIcon: Icon(Icons.calendar_today_outlined, size: 20),
+                        ),
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 12),
@@ -356,7 +390,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             const SnackBar(content: Text('Check for updates is a placeholder.')),
                           );
                         },
-                        icon: const Icon(Icons.autorenew),
+                        icon: const Icon(Icons.autorenew, size: 18),
                         label: const Text('Check Updates'),
                       ),
                     ],
@@ -387,15 +421,17 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             }),
             const SizedBox(height: 30),
-            FilledButton.icon(
-              onPressed: _logout,
-              icon: const Icon(Icons.logout_outlined),
-              label: const Text('Log Out'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _logout,
+                icon: const Icon(Icons.logout_outlined, size: 18),
+                label: const Text('Log Out'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
               ),
             ),
           ],
@@ -409,9 +445,9 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 8),
-          Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, height: 1.4)),
+          Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, height: 1.4, fontSize: 13)),
           const SizedBox(height: 16),
           child,
         ],
@@ -424,8 +460,8 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(color: AppColors.textSecondary))),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Expanded(child: Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13))),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         ],
       ),
     );

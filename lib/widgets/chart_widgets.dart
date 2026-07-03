@@ -100,7 +100,7 @@ class DonutChartCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       points.first.label,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                     ),
                   ],
                 ),
@@ -262,12 +262,12 @@ class _InterpretationBody extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.inputBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.inputBorder),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Text(
         text,
-        style: const TextStyle(height: 1.5),
+        style: const TextStyle(height: 1.6, fontSize: 13, color: AppColors.textPrimary),
       ),
     );
   }
@@ -295,7 +295,7 @@ class _LegendDot extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
-        Text('$label: $value'),
+        Text('$label: $value', style: const TextStyle(fontSize: 13)),
       ],
     );
   }
@@ -356,7 +356,7 @@ class _SmallDonutChart extends StatelessWidget {
               ),
               const Text(
                 'Completed',
-                style: TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
               ),
             ],
           ),
@@ -386,10 +386,10 @@ class _HorizontalBarChart extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: 112,
+                    width: 100,
                     child: Text(
                       point.label,
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
                     ),
                   ),
                   Expanded(
@@ -397,19 +397,19 @@ class _HorizontalBarChart extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
                         value: point.value / max,
-                        minHeight: 14,
+                        minHeight: 12,
                         backgroundColor: AppColors.inputBg,
                         valueColor: AlwaysStoppedAnimation(accent),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   SizedBox(
                     width: 28,
                     child: Text(
                       point.value.toStringAsFixed(0),
                       textAlign: TextAlign.end,
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
                     ),
                   ),
                 ],
@@ -450,14 +450,14 @@ class _BarChart extends StatelessWidget {
                     height: 130 * (point.value / max),
                     decoration: BoxDecoration(
                       color: accent,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     point.label.split(' ').first,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 10),
+                    style: const TextStyle(fontSize: 10, color: AppColors.textPrimary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

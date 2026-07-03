@@ -55,34 +55,28 @@ class _SplashLandingState extends State<SplashLanding>
           ),
         ),
         child: Center(
-              child: FadeTransition(
-                opacity: _controller,
-                child: ScaleTransition(
-                  scale: Tween<double>(begin: 0.94, end: 1).animate(
-                    CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-                  ),
-                  child: Column(
+          child: FadeTransition(
+            opacity: _controller,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.94, end: 1).animate(
+                CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+              ),
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 132,
-                    height: 132,
-                    padding: const EdgeInsets.all(18),
+                    width: 120,
+                    height: 120,
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.card.withValues(alpha: 0.88),
-                      borderRadius: BorderRadius.circular(34),
-                      border: Border.all(color: AppColors.inputBorder),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.14),
-                          blurRadius: 30,
-                          offset: const Offset(0, 16),
-                        ),
-                      ],
+                      color: AppColors.card.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: AppColors.divider),
+                      boxShadow: AppColors.shadowLg,
                     ),
                     child: Image.asset('assets/images/talaanscan.png', fit: BoxFit.contain),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 24),
                   Text(
                     'TalaanScan',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -91,9 +85,11 @@ class _SplashLandingState extends State<SplashLanding>
                         ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Frontend-only survey analytics workspace',
-                    style: TextStyle(color: AppColors.textSecondary),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                   ),
                 ],
               ),

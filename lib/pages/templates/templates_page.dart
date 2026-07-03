@@ -81,14 +81,13 @@ class TemplatesPage extends StatelessWidget {
               .map(
                 (template) => DataRow(
                   cells: [
-                    DataCell(Text(template.name)),
-                    DataCell(Text(template.category)),
+                    DataCell(Text(template.name, style: const TextStyle(fontWeight: FontWeight.w600))),
+                    DataCell(Text(template.category, style: const TextStyle(color: AppColors.textSecondary))),
                     DataCell(Text(template.usage)),
-                    DataCell(Text(template.lastUpdated)),
+                    DataCell(Text(template.lastUpdated, style: const TextStyle(color: AppColors.textSecondary))),
                     DataCell(
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Tooltip(
                             message: 'Preview',
@@ -102,7 +101,7 @@ class TemplatesPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              icon: const Icon(Icons.visibility_outlined),
+                              icon: const Icon(Icons.visibility_outlined, size: 18),
                             ),
                           ),
                           Tooltip(
@@ -117,7 +116,7 @@ class TemplatesPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              icon: const Icon(Icons.edit_outlined),
+                              icon: const Icon(Icons.edit_outlined, size: 18),
                             ),
                           ),
                           Tooltip(
@@ -136,7 +135,7 @@ class TemplatesPage extends StatelessWidget {
                                   const SnackBar(content: Text('Template duplicated successfully')),
                                 );
                               },
-                              icon: const Icon(Icons.copy_outlined),
+                              icon: const Icon(Icons.copy_outlined, size: 18),
                             ),
                           ),
                           Tooltip(
@@ -171,7 +170,7 @@ class TemplatesPage extends StatelessWidget {
                                   );
                                 }
                               },
-                              icon: const Icon(Icons.delete_outline),
+                              icon: const Icon(Icons.delete_outline, size: 18),
                             ),
                           ),
                         ],

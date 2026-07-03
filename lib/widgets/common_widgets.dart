@@ -14,25 +14,22 @@ class SurfaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.card, AppColors.surface],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.inputBorder),
+        color: theme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.outlineVariant, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.16),
-            blurRadius: 22,
-            offset: const Offset(0, 12),
+            color: theme.shadow.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(20),
         child: Material(
           color: Colors.transparent,
           child: Padding(
@@ -59,6 +56,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -70,6 +68,7 @@ class SectionHeader extends StatelessWidget {
                 title,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                     ),
               ),
               if (subtitle != null) ...[
@@ -77,7 +76,7 @@ class SectionHeader extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: theme.onSurfaceVariant,
                       ),
                 ),
               ],
@@ -110,26 +109,20 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Transform.scale(
       scale: scale,
       child: Container(
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              accent.withValues(alpha: 0.18),
-              AppColors.card,
-            ],
-          ),
-          border: Border.all(color: AppColors.inputBorder),
+          borderRadius: BorderRadius.circular(20),
+          color: theme.surface,
+          border: Border.all(color: theme.outlineVariant, width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
+              color: theme.shadow.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -143,24 +136,24 @@ class StatCard extends StatelessWidget {
                   child: Text(
                     label,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: theme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
                         ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: accent,
+                    borderRadius: BorderRadius.circular(12),
+                    color: accent.withValues(alpha: 0.15),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 20),
+                  child: Icon(icon, color: accent, size: 20),
                 ),
               ],
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             Text(
               value,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -168,11 +161,11 @@ class StatCard extends StatelessWidget {
                     letterSpacing: -0.4,
                   ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               delta,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: theme.onSurfaceVariant,
                   ),
             ),
           ],
@@ -195,18 +188,19 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.22)),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.w600,
-          fontSize: 12,
+          fontSize: 11,
+          letterSpacing: 0.3,
         ),
       ),
     );
@@ -227,25 +221,27 @@ class ChartToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: selected ? AppColors.primary : AppColors.inputBg,
-        borderRadius: BorderRadius.circular(999),
+        color: selected ? theme.primary : theme.surfaceContainer,
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: selected ? AppColors.primary : AppColors.inputBorder,
+          color: selected ? theme.primary : theme.outline,
         ),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.white : AppColors.textSecondary,
+              color: selected ? theme.onPrimary : theme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ),
@@ -267,10 +263,10 @@ class AccentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
@@ -278,6 +274,7 @@ class AccentChip extends StatelessWidget {
           color: color,
           fontSize: 11,
           fontWeight: FontWeight.w700,
+          letterSpacing: 0.3,
         ),
       ),
     );
@@ -296,19 +293,24 @@ class DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Row(
       children: [
         SizedBox(
-          width: 130,
+          width: 120,
           child: Text(
             label,
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: theme.onSurfaceVariant, fontSize: 13),
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: theme.onSurface,
+            ),
           ),
         ),
       ],

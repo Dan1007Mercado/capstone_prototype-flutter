@@ -15,127 +15,132 @@ class AnalyticsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final questions = buildQuestionInsights();
 
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        SurfaceCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                surveyName == null ? 'Analytics' : 'Analytics · $surveyName',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Mock analytics only. The layout mirrors a modern SaaS reporting workspace.',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth > 900;
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(surveyName == null ? 'Analytics' : surveyName!),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          SurfaceCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
-                  child: StatCard(
-                    label: 'Total Responses',
-                    value: '1,240',
-                    icon: Icons.groups_outlined,
-                    accent: AppColors.primary,
-                    delta: '+12% this week',
-                  ),
+                Text(
+                  surveyName == null ? 'Analytics' : 'Analytics · $surveyName',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
                 ),
-                SizedBox(
-                  width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
-                  child: StatCard(
-                    label: 'Last Sync Time',
-                    value: '07/03/2026 08:15 AM',
-                    icon: Icons.schedule_outlined,
-                    accent: AppColors.info,
-                    delta: 'Live mock feed',
-                  ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Mock analytics only. The layout mirrors a modern SaaS reporting workspace.',
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: FilledButton.tonalIcon(
-            onPressed: () => _showOverallInterpretation(context, questions),
-            icon: const Icon(Icons.auto_awesome_outlined),
-            label: const Text('Overall Interpretation'),
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth > 980;
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                SizedBox(
-                  width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
-                  child: const LineChartCard(
-                    title: 'Responses Over Time',
-                    subtitle: 'Weekly data across 6 periods.',
-                    points: weeklyResponses,
-                  ),
-                ),
-                SizedBox(
-                  width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
-                  child: const DonutChartCard(
-                    title: 'Response Status Summary',
-                    subtitle: 'Completed vs In Progress with a large center hole.',
-                    points: responseStatusSummary,
-                    holeFraction: 0.70,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-        SectionHeader(
-          title: 'Question Analytics',
-          subtitle: 'Twenty mock quantitative questions with toggled chart and interpretation views.',
-        ),
-        const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth > 1100;
-            final cardWidth = wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth;
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                for (var i = 0; i < questions.length; i++)
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 900;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
                   SizedBox(
-                    width: cardWidth,
-                    child: MiniChartCard(
-                      title: questions[i].title,
-                      type: questions[i].chartType,
-                      points: questions[i].points,
-                      interpretation: questions[i].interpretation,
-                      accent: _accentForIndex(i),
+                    width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
+                    child: StatCard(
+                      label: 'Total Responses',
+                      value: '1,240',
+                      icon: Icons.groups_outlined,
+                      accent: AppColors.primary,
+                      delta: '+12% this week',
                     ),
                   ),
-              ],
-            );
-          },
-        ),
-      ],
+                  SizedBox(
+                    width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
+                    child: StatCard(
+                      label: 'Last Sync Time',
+                      value: '07/03/2026 08:15 AM',
+                      icon: Icons.schedule_outlined,
+                      accent: AppColors.info,
+                      delta: 'Live mock feed',
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.tonalIcon(
+              onPressed: () => _showOverallInterpretation(context, questions),
+              icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+              label: const Text('Overall Interpretation'),
+            ),
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 980;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  SizedBox(
+                    width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
+                    child: const LineChartCard(
+                      title: 'Responses Over Time',
+                      subtitle: 'Weekly data across 6 periods.',
+                      points: weeklyResponses,
+                    ),
+                  ),
+                  SizedBox(
+                    width: wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth,
+                    child: const DonutChartCard(
+                      title: 'Response Status Summary',
+                      subtitle: 'Completed vs In Progress with a large center hole.',
+                      points: responseStatusSummary,
+                      holeFraction: 0.70,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: 'Question Analytics',
+            subtitle: 'Twenty mock quantitative questions with toggled chart and interpretation views.',
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 1100;
+              final cardWidth = wide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  for (var i = 0; i < questions.length; i++)
+                    SizedBox(
+                      width: cardWidth,
+                      child: MiniChartCard(
+                        title: questions[i].title,
+                        type: questions[i].chartType,
+                        points: questions[i].points,
+                        interpretation: questions[i].interpretation,
+                        accent: _accentForIndex(i),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -157,10 +162,9 @@ class AnalyticsPage extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
         title: const Text('Overall Interpretation'),
         content: SizedBox(
-          width: 640,
+          width: 600,
           child: SingleChildScrollView(
             child: Text(
               text,

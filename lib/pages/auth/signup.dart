@@ -82,7 +82,7 @@ class _SignupPageState extends State<SignupPage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF111522), AppColors.background],
+            colors: [Color(0xFF0F1420), AppColors.background],
           ),
         ),
         child: SafeArea(
@@ -106,7 +106,7 @@ class _SignupPageState extends State<SignupPage> {
                 child: Column(
                   children: [
                     branding,
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     form,
                   ],
                 ),
@@ -120,31 +120,33 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildBranding(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(32),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 540),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
                 'Build a new account.',
-                style: TextStyle(
-                  fontSize: 44,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -1,
-                ),
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1,
+                    ),
               ),
-              SizedBox(height: 14),
+              const SizedBox(height: 12),
               Text(
                 'Create a mock TalaanScan profile and enter the dashboard immediately.',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16, height: 1.5),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
               ),
-              SizedBox(height: 22),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
+              const SizedBox(height: 24),
+              const Wrap(
+                spacing: 10,
+                runSpacing: 10,
                 children: [
                   _FeatureChip('Manual signup'),
                   _FeatureChip('Google option'),
@@ -160,19 +162,13 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildForm(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: AppColors.card.withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.inputBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 40,
-            offset: const Offset(0, 18),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: AppColors.shadowLg,
       ),
       child: Form(
         key: _formKey,
@@ -184,23 +180,31 @@ class _SignupPageState extends State<SignupPage> {
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Complete the fields below to create a frontend-only account.',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             LayoutBuilder(
               builder: (context, constraints) {
                 final twoColumn = constraints.maxWidth > 540;
                 final spacing = const SizedBox(height: 14);
-                final firstName = TextFormField(
+                final firstNameField = TextFormField(
                   controller: _firstName,
-                  decoration: const InputDecoration(labelText: 'First Name'),
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    prefixIcon: Icon(Icons.person_outline, size: 20),
+                  ),
                   validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
                 );
-                final lastName = TextFormField(
+                final lastNameField = TextFormField(
                   controller: _lastName,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    prefixIcon: Icon(Icons.person_outline, size: 20),
+                  ),
                   validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
                 );
 
@@ -209,14 +213,14 @@ class _SignupPageState extends State<SignupPage> {
                     if (twoColumn)
                       Row(
                         children: [
-                          Expanded(child: firstName),
+                          Expanded(child: firstNameField),
                           const SizedBox(width: 12),
-                          Expanded(child: lastName),
+                          Expanded(child: lastNameField),
                         ],
                       )
                     else
                       Column(
-                        children: [firstName, spacing, lastName],
+                        children: [firstNameField, spacing, lastNameField],
                       ),
                     spacing,
                     TextFormField(
@@ -225,20 +229,27 @@ class _SignupPageState extends State<SignupPage> {
                       onTap: _pickBirthday,
                       decoration: const InputDecoration(
                         labelText: 'Birthday',
-                        suffixIcon: Icon(Icons.calendar_month_outlined),
+                        suffixIcon: Icon(Icons.calendar_month_outlined, size: 20),
+                        prefixIcon: Icon(Icons.cake_outlined, size: 20),
                       ),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Select your birthday' : null,
                     ),
                     spacing,
                     TextFormField(
                       controller: _email,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email_outlined, size: 20),
+                      ),
                       validator: (value) => value == null || !value.contains('@') ? 'Enter a valid email' : null,
                     ),
                     spacing,
                     TextFormField(
                       controller: _username,
-                      decoration: const InputDecoration(labelText: 'Username'),
+                      decoration: const InputDecoration(
+                        labelText: 'Username',
+                        prefixIcon: Icon(Icons.alternate_email_outlined, size: 20),
+                      ),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
                     ),
                     spacing,
@@ -247,9 +258,10 @@ class _SignupPageState extends State<SignupPage> {
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock_outline, size: 20),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                          icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                          icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
                         ),
                       ),
                       validator: (value) => value == null || value.length < 4 ? 'Use at least 4 characters' : null,
@@ -260,9 +272,10 @@ class _SignupPageState extends State<SignupPage> {
                       obscureText: _obscureConfirm,
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
+                        prefixIcon: const Icon(Icons.lock_outline, size: 20),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                          icon: Icon(_obscureConfirm ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                          icon: Icon(_obscureConfirm ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
                         ),
                       ),
                       validator: (value) {
@@ -275,7 +288,7 @@ class _SignupPageState extends State<SignupPage> {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
@@ -283,12 +296,12 @@ class _SignupPageState extends State<SignupPage> {
                 child: const Text('Create Account'),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () => _showSnack('Google signup is a mock action'),
-                icon: const Icon(Icons.g_mobiledata),
+                icon: const Icon(Icons.g_mobiledata, size: 20),
                 label: const Text('Continue with Google'),
               ),
             ),
@@ -296,7 +309,12 @@ class _SignupPageState extends State<SignupPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Already have an account?'),
+                Text(
+                  'Already have an account?',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Back to login'),
@@ -320,9 +338,10 @@ class _FeatureChip extends StatelessWidget {
     return Chip(
       label: Text(label),
       backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.inputBorder),
-      labelStyle: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      side: const BorderSide(color: AppColors.divider),
+      labelStyle: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 }

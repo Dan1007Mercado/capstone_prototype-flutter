@@ -206,8 +206,8 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ? null
           : FloatingActionButton.extended(
               onPressed: _showAddComponentSheet,
-              icon: const Icon(Icons.add),
-              label: const Text('+ Add Component'),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Component'),
             ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -227,7 +227,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Template Name',
-                    prefixIcon: Icon(Icons.edit_outlined),
+                    prefixIcon: Icon(Icons.edit_outlined, size: 20),
                   ),
                 ),
               ],
@@ -335,21 +335,22 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: InkWell(
                   onTap: () => _selectComponent(index),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: selected ? AppColors.surface : AppColors.inputBg,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: selected ? AppColors.primary : AppColors.inputBorder,
+                        color: selected ? AppColors.primary : AppColors.divider,
+                        width: selected ? 1.5 : 0.5,
                       ),
                     ),
                     child: Row(
                       children: [
                         ReorderableDragStartListener(
                           index: index,
-                          child: const Icon(Icons.drag_indicator),
+                          child: Icon(Icons.drag_indicator, color: AppColors.textSecondary),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -358,19 +359,19 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                             children: [
                               Text(
                                 component.label,
-                                style: const TextStyle(fontWeight: FontWeight.w700),
+                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 3),
                               Text(
                                 component.type,
-                                style: const TextStyle(color: AppColors.textSecondary),
+                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         AccentChip(label: component.category, color: AppColors.primary),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 8),
                         if (_canEdit)
                           IconButton(
                             onPressed: () {
@@ -384,7 +385,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                                 }
                               });
                             },
-                            icon: const Icon(Icons.delete_outline),
+                            icon: const Icon(Icons.delete_outline, size: 18),
                           ),
                       ],
                     ),
@@ -414,7 +415,10 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ),
           const SizedBox(height: 16),
           TextField(
-            decoration: const InputDecoration(labelText: 'Label'),
+            decoration: const InputDecoration(
+              labelText: 'Label',
+              prefixIcon: Icon(Icons.label_outline, size: 20),
+            ),
             controller: _labelController,
             readOnly: !_canEdit,
             onChanged: _canEdit
@@ -423,7 +427,11 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ),
           const SizedBox(height: 12),
           TextField(
-            decoration: const InputDecoration(labelText: 'Description'),
+            decoration: const InputDecoration(
+              labelText: 'Description',
+              prefixIcon: Icon(Icons.description_outlined, size: 20),
+              alignLabelWithHint: true,
+            ),
             controller: _descriptionController,
             maxLines: 2,
             readOnly: !_canEdit,
@@ -431,7 +439,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                 ? (value) => _updateSelectedComponent((current) => current.copyWith(description: value))
                 : null,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Required'),
@@ -442,12 +450,12 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ),
           if (showChoices) ...[
             const SizedBox(height: 12),
-            const Text('Choices', style: TextStyle(fontWeight: FontWeight.w700)),
+            const Text('Choices', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
             const SizedBox(height: 8),
             if (component.choices.isEmpty)
               Text(
                 _canEdit ? 'No choices added yet.' : 'No choices defined.',
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
               )
             else
               Wrap(
@@ -459,6 +467,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                     .map(
                       (entry) => Chip(
                         label: Text('${entry.key + 1}. ${entry.value}'),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     )
                     .toList(),
@@ -467,14 +476,17 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
             if (_canEdit)
               OutlinedButton.icon(
                 onPressed: _showAddChoiceDialog,
-                icon: const Icon(Icons.add_circle_outline),
+                icon: const Icon(Icons.add_circle_outline, size: 18),
                 label: const Text('Add Choice'),
               ),
           ],
           if (showScaleValues) ...[
             const SizedBox(height: 12),
             TextField(
-              decoration: const InputDecoration(labelText: 'Scale Values'),
+              decoration: const InputDecoration(
+                labelText: 'Scale Values',
+                prefixIcon: Icon(Icons.tune_outlined, size: 20),
+              ),
               controller: _scaleValuesController,
               readOnly: !_canEdit,
               onChanged: _canEdit
@@ -493,7 +505,10 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           if (showPlaceholder) ...[
             const SizedBox(height: 12),
             TextField(
-              decoration: const InputDecoration(labelText: 'Placeholder'),
+              decoration: const InputDecoration(
+                labelText: 'Placeholder',
+                prefixIcon: Icon(Icons.text_fields_outlined, size: 20),
+              ),
               controller: _placeholderController,
               readOnly: !_canEdit,
               onChanged: _canEdit
@@ -505,7 +520,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
             const SizedBox(height: 12),
             Text(
               'This component has no additional configuration fields.',
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
             ),
           ],
         ],
@@ -638,13 +653,15 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
               controller: controller,
               padding: const EdgeInsets.all(20),
               children: [
-                const Text(
-                  '+ Add Component',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                Text(
+                  'Add Component',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 for (final entry in groupedComponents.entries) ...[
-                  Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w700)),
+                  Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textSecondary, letterSpacing: 0.5)),
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 10,
@@ -699,14 +716,17 @@ class _StyleOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: selected ? AppColors.surface : AppColors.inputBg,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: selected ? AppColors.primary : AppColors.inputBorder),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.divider,
+            width: selected ? 1.5 : 0.5,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -716,16 +736,16 @@ class _StyleOptionCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                   ),
                 ),
-                if (selected) const Icon(Icons.check_circle_outline, color: AppColors.primary),
+                if (selected) const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
+              style: const TextStyle(color: AppColors.textSecondary, height: 1.5, fontSize: 13),
             ),
           ],
         ),

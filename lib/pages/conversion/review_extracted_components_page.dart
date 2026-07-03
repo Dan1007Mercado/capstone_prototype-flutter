@@ -147,7 +147,7 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                   controller: _templateNameController,
                   decoration: const InputDecoration(
                     labelText: 'Template Name',
-                    prefixIcon: Icon(Icons.drive_file_rename_outline),
+                    prefixIcon: Icon(Icons.drive_file_rename_outline, size: 20),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -155,7 +155,7 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                   controller: _categoryController,
                   decoration: const InputDecoration(
                     labelText: 'Template Category',
-                    prefixIcon: Icon(Icons.category_outlined),
+                    prefixIcon: Icon(Icons.category_outlined, size: 20),
                   ),
                 ),
               ],
@@ -172,7 +172,15 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                 ),
                 const SizedBox(height: 16),
                 if (_components.isEmpty)
-                  const Text('No extracted components are available. Return to the converter to start again.')
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        'No extracted components are available. Return to the converter to start again.',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                    ),
+                  )
                 else
                   ReorderableListView.builder(
                     shrinkWrap: true,
@@ -189,8 +197,8 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: AppColors.inputBg,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.inputBorder),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.divider),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +208,7 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                                   Expanded(
                                     child: Text(
                                       '${item.type} ${item.questionNumber != null ? '#${item.questionNumber}' : ''}',
-                                      style: const TextStyle(fontWeight: FontWeight.w700),
+                                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                                     ),
                                   ),
                                   IconButton(
@@ -219,27 +227,37 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                                         _components.removeAt(index);
                                       });
                                     },
-                                    icon: const Icon(Icons.delete_outline),
+                                    icon: const Icon(Icons.delete_outline, size: 18),
                                     tooltip: 'Delete component',
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 12),
                               TextField(
-                                decoration: const InputDecoration(labelText: 'Label'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Label',
+                                  prefixIcon: Icon(Icons.label_outline, size: 20),
+                                ),
                                 controller: TextEditingController(text: item.label),
                                 onChanged: (value) => _updateComponent(index, item.copyWith(label: value)),
                               ),
                               const SizedBox(height: 12),
                               TextField(
-                                decoration: const InputDecoration(labelText: 'Description'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Description',
+                                  prefixIcon: Icon(Icons.description_outlined, size: 20),
+                                  alignLabelWithHint: true,
+                                ),
                                 controller: TextEditingController(text: item.description),
                                 onChanged: (value) => _updateComponent(index, item.copyWith(description: value)),
                                 maxLines: 2,
                               ),
                               const SizedBox(height: 12),
                               TextField(
-                                decoration: const InputDecoration(labelText: 'Question Number'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Question Number',
+                                  prefixIcon: Icon(Icons.tag_outlined, size: 20),
+                                ),
                                 controller: TextEditingController(text: item.questionNumber?.toString() ?? ''),
                                 keyboardType: TextInputType.number,
                                 onChanged: (value) {
@@ -249,7 +267,10 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                               ),
                               const SizedBox(height: 12),
                               TextField(
-                                decoration: const InputDecoration(labelText: 'Alignment'),
+                                decoration: const InputDecoration(
+                                  labelText: 'Alignment',
+                                  prefixIcon: Icon(Icons.align_horizontal_left_outlined, size: 20),
+                                ),
                                 controller: TextEditingController(text: item.alignment ?? ''),
                                 onChanged: (value) => _updateComponent(index, item.copyWith(alignment: value.isEmpty ? null : value)),
                               ),
@@ -277,7 +298,7 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
                         );
                       });
                     },
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(Icons.add, size: 18),
                     label: const Text('Add Missing Component'),
                   ),
                 ),
@@ -287,12 +308,15 @@ class _ReviewExtractedComponentsPageState extends State<ReviewExtractedComponent
           const SizedBox(height: 20),
           Row(
             children: [
-              OutlinedButton(
-                onPressed: () => _confirmCancel(appState),
-                child: const Text('Cancel'),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _confirmCancel(appState),
+                  child: const Text('Cancel'),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
+                flex: 2,
                 child: FilledButton(
                   onPressed: _components.isEmpty ? null : () => _saveTemplate(appState),
                   child: const Text('Save Template'),

@@ -47,7 +47,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     maxCrossAxisExtent: 360,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    mainAxisExtent: 172,
+                    mainAxisExtent: 160,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -81,35 +81,35 @@ class _DashboardPageState extends State<DashboardPage> {
                           height: 300,
                           child: ListView.separated(
                             itemCount: recentActivities.length,
-                            separatorBuilder: (_, _) => const SizedBox(height: 12),
+                            separatorBuilder: (_, _) => const SizedBox(height: 10),
                             itemBuilder: (context, index) {
                               final item = recentActivities[index];
                               return Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
                                   color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: AppColors.inputBorder),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: AppColors.divider),
                                 ),
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: 42,
-                                      height: 42,
+                                      width: 38,
+                                      height: 38,
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary.withValues(alpha: 0.16),
-                                        borderRadius: BorderRadius.circular(14),
+                                        color: AppColors.primary.withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Icon(item.icon, color: AppColors.primary),
+                                      child: Icon(item.icon, color: AppColors.primary, size: 18),
                                     ),
                                     const SizedBox(width: 14),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(item.title, style: const TextStyle(fontWeight: FontWeight.w700)),
-                                          const SizedBox(height: 4),
-                                          Text(item.subtitle, style: const TextStyle(color: AppColors.textSecondary)),
+                                          Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                          const SizedBox(height: 3),
+                                          Text(item.subtitle, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
                                         ],
                                       ),
                                     ),
@@ -156,22 +156,25 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'This screen uses mock data only and keeps the visual system dark, compact, and responsive.',
-                  style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.5,
+                      ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 20),
           Container(
-            width: 120,
-            height: 120,
+            width: 100,
+            height: 100,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(28),
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(24),
             ),
-            child: const Icon(Icons.dashboard_customize_outlined, size: 58, color: AppColors.primary),
+            child: const Icon(Icons.dashboard_customize_outlined, size: 48, color: AppColors.primary),
           ),
         ],
       ),

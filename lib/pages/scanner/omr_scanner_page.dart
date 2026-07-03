@@ -94,12 +94,12 @@ class _OmrScannerPageState extends State<OmrScannerPage> {
                   children: [
                     FilledButton.icon(
                       onPressed: _capturePage,
-                      icon: const Icon(Icons.camera_alt_outlined),
+                      icon: const Icon(Icons.camera_alt_outlined, size: 18),
                       label: Text(_supportsCamera ? 'Open Camera' : 'Camera Unsupported'),
                     ),
                     OutlinedButton.icon(
                       onPressed: _uploadImages,
-                      icon: const Icon(Icons.upload_file_outlined),
+                      icon: const Icon(Icons.upload_file_outlined, size: 18),
                       label: const Text('Upload Images'),
                     ),
                     TextButton(
@@ -110,9 +110,21 @@ class _OmrScannerPageState extends State<OmrScannerPage> {
                 ),
                 const SizedBox(height: 16),
                 if (_images.isEmpty)
-                  const Text(
-                    'No pages selected yet. Use the camera repeatedly until you finish, or upload a batch of images.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.image_outlined, size: 48, color: AppColors.textDisabled),
+                          SizedBox(height: 12),
+                          Text(
+                            'No pages selected yet. Use the camera repeatedly until you finish, or upload a batch of images.',
+                            style: TextStyle(color: AppColors.textSecondary),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   )
                 else
                   LayoutBuilder(
@@ -149,7 +161,7 @@ class _OmrScannerPageState extends State<OmrScannerPage> {
                   children: [
                     Text(
                       '${_images.length} image${_images.length == 1 ? '' : 's'} selected',
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                     ),
                     const Spacer(),
                     FilledButton(
@@ -248,7 +260,6 @@ class _OmrScannerPageState extends State<OmrScannerPage> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: AppColors.card,
           title: const Text('Process Scanner Output'),
           content: const Text(
             'Would you like to wait for the scan to finish or run it in the background while you continue using the app?',
@@ -336,26 +347,26 @@ class _SurveyInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.inputBorder),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             survey.name,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           DetailRow(label: 'Survey ID', value: survey.id),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           DetailRow(label: 'Template', value: survey.templateUsed),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           DetailRow(label: 'Category', value: survey.category),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           DetailRow(label: 'Status', value: shortStatusLabel(survey.status)),
         ],
       ),
@@ -377,42 +388,43 @@ class _ScanImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.inputBorder),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 118,
+            height: 110,
             decoration: BoxDecoration(
               color: AppColors.inputBg,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Icon(Icons.image_outlined, size: 36, color: AppColors.primary),
+              child: Icon(Icons.image_outlined, size: 32, color: AppColors.primary),
             ),
           ),
           const SizedBox(height: 10),
           Text(
             'Page $index',
-            style: const TextStyle(fontWeight: FontWeight.w700),
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             image.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: onRemove,
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
               child: const Text('Remove'),
             ),
           ),
@@ -436,14 +448,17 @@ class _ProcessingPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Processing Scanner Output', style: TextStyle(fontWeight: FontWeight.w700)),
+        const Text('Processing Scanner Output', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
         const SizedBox(height: 8),
         const Text(
           'The scanner is extracting and validating OMR responses.',
-          style: TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
         ),
         const SizedBox(height: 16),
-        LinearProgressIndicator(value: progress == 0 ? null : progress),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: LinearProgressIndicator(value: progress == 0 ? null : progress, minHeight: 6),
+        ),
         const SizedBox(height: 18),
         for (final stage in stages) ...[
           _ProcessingStageRow(
@@ -471,23 +486,26 @@ class _ProcessingStageRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         ),
         const SizedBox(width: 12),
         SizedBox(
-          width: 140,
-          child: LinearProgressIndicator(
-            value: percent <= 0 ? null : percent / 100,
-            minHeight: 8,
+          width: 120,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: percent <= 0 ? null : percent / 100,
+              minHeight: 6,
+            ),
           ),
         ),
         const SizedBox(width: 12),
         SizedBox(
-          width: 48,
+          width: 40,
           child: Text(
             '${percent.clamp(0, 100).toStringAsFixed(0)}%',
             textAlign: TextAlign.right,
-            style: const TextStyle(fontWeight: FontWeight.w700),
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
         ),
       ],

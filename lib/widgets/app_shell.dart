@@ -90,17 +90,44 @@ class _AppShellState extends State<AppShell> {
               controller: controller,
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               children: [
-                Text(
-                  'Notifications',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
+                Row(
+                  children: [
+                    Text(
+                      'Notifications',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const Spacer(),
+                    if (appState.notifications.isNotEmpty)
+                      TextButton(
+                        onPressed: () {
+                          appState.markNotificationsRead();
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Mark all read'),
                       ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                for (final item in appState.notifications) ...[
-                  SurfaceNotificationTile(item: item),
-                  const SizedBox(height: 12),
-                ],
+                if (appState.notifications.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.notifications_none_outlined, size: 48, color: AppColors.textDisabled),
+                          SizedBox(height: 12),
+                          Text('No notifications yet.', style: TextStyle(color: AppColors.textSecondary)),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  for (final item in appState.notifications) ...[
+                    _NotificationTile(item: item),
+                    const SizedBox(height: 12),
+                  ],
               ],
             );
           },
@@ -132,7 +159,6 @@ class _AppShellState extends State<AppShell> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: AppColors.card,
               title: const Text('Select Survey'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -242,7 +268,8 @@ class _AppShellState extends State<AppShell> {
                       decoration: BoxDecoration(
                         color: AppColors.card,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: AppColors.inputBorder),
+                        border: Border.all(color: AppColors.divider),
+                        boxShadow: AppColors.shadowLg,
                       ),
                       child: Row(
                         children: [
@@ -333,7 +360,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.textPrimary : AppColors.textSecondary;
+    final color = selected ? AppColors.primary : AppColors.textSecondary;
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -341,7 +368,7 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color),
+            Icon(icon, color: color, size: 22),
             const SizedBox(height: 5),
             Text(
               label,
@@ -359,8 +386,8 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-class SurfaceNotificationTile extends StatelessWidget {
-  const SurfaceNotificationTile({super.key, required this.item});
+class _NotificationTile extends StatelessWidget {
+  const _NotificationTile({required this.item});
 
   final NotificationItem item;
 
@@ -370,20 +397,20 @@ class SurfaceNotificationTile extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.inputBorder),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(14),
+              color: AppColors.primary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(item.icon, color: AppColors.primary),
+            child: Icon(item.icon, color: AppColors.primary, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -392,12 +419,12 @@ class SurfaceNotificationTile extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item.subtitle,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -445,10 +472,11 @@ class _IconBadgeButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.error,
                 borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: AppColors.error, width: 1.5),
               ),
               child: Text(
                 badgeCount > 9 ? '9+' : '$badgeCount',
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
               ),
             ),
           ),
@@ -504,7 +532,7 @@ class _GlobalFloatingActionMenuState extends State<GlobalFloatingActionMenu> {
     ];
 
     return SizedBox(
-      width: 236,
+      width: 220,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -529,6 +557,7 @@ class _GlobalFloatingActionMenuState extends State<GlobalFloatingActionMenu> {
             onPressed: _toggle,
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
+            elevation: 4,
             child: AnimatedRotation(
               turns: _open ? 0.125 : 0,
               duration: const Duration(milliseconds: 180),
@@ -563,21 +592,15 @@ class _DialActionTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         onTap: action.onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.card,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.inputBorder),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 14,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.divider),
+            boxShadow: AppColors.shadowMd,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -586,7 +609,7 @@ class _DialActionTile extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 action.label,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               ),
             ],
           ),
@@ -595,3 +618,4 @@ class _DialActionTile extends StatelessWidget {
     );
   }
 }
+

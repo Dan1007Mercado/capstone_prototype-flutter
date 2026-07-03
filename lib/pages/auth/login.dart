@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF111522), AppColors.background],
+            colors: [Color(0xFF0F1420), AppColors.background],
           ),
         ),
         child: SafeArea(
@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                 return Row(
                   children: [
                     Expanded(flex: 5, child: branding),
-                    Expanded(flex: 4, child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 480), child: form))),
+                    Expanded(flex: 4, child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 440), child: form))),
                   ],
                 );
               }
@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
                     branding,
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     form,
                   ],
                 ),
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildBranding(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(32),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 540),
@@ -100,17 +100,17 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 82,
-                height: 82,
-                padding: const EdgeInsets.all(14),
+                width: 72,
+                height: 72,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.card.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.inputBorder),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.divider),
                 ),
                 child: Image.asset('assets/images/talaanscan.png', fit: BoxFit.contain),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               Text(
                 'TalaanScan',
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -118,15 +118,18 @@ class _LoginPageState extends State<LoginPage> {
                       letterSpacing: -1,
                     ),
               ),
-              const SizedBox(height: 14),
-              const Text(
+              const SizedBox(height: 12),
+              Text(
                 'A dark, modern dashboard for survey workflows, conversion, and analytics.',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16, height: 1.5),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
               ),
               const SizedBox(height: 24),
               const Wrap(
-                spacing: 12,
-                runSpacing: 12,
+                spacing: 10,
+                runSpacing: 10,
                 children: [
                   _FeatureChip('Responsive UI'),
                   _FeatureChip('Mock data only'),
@@ -143,19 +146,13 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildForm(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: AppColors.card.withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.inputBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 40,
-            offset: const Offset(0, 18),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: AppColors.shadowLg,
       ),
       child: Form(
         key: _formKey,
@@ -169,30 +166,36 @@ class _LoginPageState extends State<LoginPage> {
                   ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Use your username and password to enter the workspace.',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
             TextFormField(
               controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
+              decoration: const InputDecoration(
+                labelText: 'Username',
+                prefixIcon: Icon(Icons.person_outline, size: 20),
+              ),
               validator: (value) => value == null || value.trim().isEmpty ? 'Enter your username' : null,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _passwordController,
               obscureText: _obscurePassword,
               decoration: InputDecoration(
                 labelText: 'Password',
+                prefixIcon: const Icon(Icons.lock_outline, size: 20),
                 suffixIcon: IconButton(
                   onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                  icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                  icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
                 ),
               ),
               validator: (value) => value == null || value.length < 4 ? 'Enter a password' : null,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
@@ -200,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text('Forgot Password?'),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
@@ -208,12 +211,12 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text('Sign In'),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () => _showSnack('Google sign-in is a mock action'),
-                icon: const Icon(Icons.g_mobiledata),
+                icon: const Icon(Icons.g_mobiledata, size: 20),
                 label: const Text('Continue with Google'),
               ),
             ),
@@ -221,7 +224,12 @@ class _LoginPageState extends State<LoginPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('No account yet?'),
+                Text(
+                  'No account yet?',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SignupPage()));
@@ -247,9 +255,10 @@ class _FeatureChip extends StatelessWidget {
     return Chip(
       label: Text(label),
       backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.inputBorder),
-      labelStyle: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      side: const BorderSide(color: AppColors.divider),
+      labelStyle: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 }

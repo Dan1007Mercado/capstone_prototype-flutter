@@ -47,20 +47,27 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                     title: 'Survey Information',
                     subtitle: 'Mock deploy form with frontend-only state updates.',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _titleController,
-                    decoration: const InputDecoration(labelText: 'Survey Title'),
+                    decoration: const InputDecoration(
+                      labelText: 'Survey Title',
+                      prefixIcon: Icon(Icons.title_outlined, size: 20),
+                    ),
                     validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   TextFormField(
                     controller: _descriptionController,
                     maxLines: 3,
-                    decoration: const InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                      prefixIcon: Icon(Icons.description_outlined, size: 20),
+                      alignLabelWithHint: true,
+                    ),
                     validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     initialValue: _template,
                     items: const [
@@ -70,9 +77,12 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                       DropdownMenuItem(value: 'Healthcare Access Survey', child: Text('Healthcare Access Survey')),
                     ],
                     onChanged: (value) => setState(() => _template = value ?? _template),
-                    decoration: const InputDecoration(labelText: 'Template Selection'),
+                    decoration: const InputDecoration(
+                      labelText: 'Template Selection',
+                      prefixIcon: Icon(Icons.view_agenda_outlined, size: 20),
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     initialValue: _targetController.text,
                     items: const [
@@ -82,9 +92,12 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                       DropdownMenuItem(value: '1000', child: Text('1000')),
                     ],
                     onChanged: (value) => setState(() => _targetController.text = value ?? '250'),
-                    decoration: const InputDecoration(labelText: 'Target Response Count'),
+                    decoration: const InputDecoration(
+                      labelText: 'Target Response Count',
+                      prefixIcon: Icon(Icons.people_outline, size: 20),
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final wide = constraints.maxWidth > 760;
@@ -123,12 +136,12 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                         children: [
                           fields[0],
                           const SizedBox(height: 12),
-                          fields[2],
+                          fields[1],
                         ],
                       );
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -199,10 +212,18 @@ class _DateField extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
       child: InputDecorator(
-        decoration: InputDecoration(labelText: label, suffixIcon: const Icon(Icons.calendar_month_outlined)),
-        child: Text(value == null ? 'Select date' : '${value!.year}-${value!.month}-${value!.day}'),
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: const Icon(Icons.calendar_month_outlined, size: 20),
+        ),
+        child: Text(
+          value == null ? 'Select date' : '${value!.year}-${value!.month}-${value!.day}',
+          style: TextStyle(
+            color: value == null ? AppColors.textDisabled : AppColors.textPrimary,
+          ),
+        ),
       ),
     );
   }

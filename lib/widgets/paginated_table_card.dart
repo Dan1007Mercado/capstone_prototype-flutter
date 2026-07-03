@@ -61,8 +61,19 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
           const SizedBox(height: 16),
           if (widget.rows.isEmpty)
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Text('No records available.'),
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.table_rows_outlined, size: 40, color: AppColors.textDisabled),
+                    SizedBox(height: 12),
+                    Text(
+                      'No records available.',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
             )
           else
             SingleChildScrollView(
@@ -73,32 +84,45 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
                   columns: widget.columns,
                   rows: rows,
                   columnSpacing: 24,
-                  horizontalMargin: 12,
+                  horizontalMargin: 16,
                   headingRowHeight: 52,
-                  dataRowMinHeight: 88,
-                  dataRowMaxHeight: 118,
+                  dataRowMinHeight: 64,
+                  dataRowMaxHeight: 88,
                 ),
               ),
             ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(
-                'Page ${_page + 1} of $_totalPages',
-                style: const TextStyle(color: AppColors.textSecondary),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: _previousPage,
-                child: const Text('Previous'),
-              ),
-              const SizedBox(width: 8),
-              FilledButton(
-                onPressed: _nextPage,
-                child: const Text('Next'),
-              ),
-            ],
-          ),
+          if (widget.rows.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Text(
+                  'Page ${_page + 1} of $_totalPages',
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: _previousPage,
+                  icon: const Icon(Icons.chevron_left, size: 18),
+                  label: const Text('Previous'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: _nextPage,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Next'),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.chevron_right, size: 18),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
