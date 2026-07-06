@@ -20,26 +20,40 @@ class LineChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return SurfaceCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeader(title: title, subtitle: subtitle),
           const SizedBox(height: 16),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: 1),
-            duration: const Duration(milliseconds: 900),
-            curve: Curves.easeOutCubic,
-            builder: (context, progress, child) {
-              return SizedBox(
-                height: 240,
-                child: CustomPaint(
-                  painter: _LinePainter(points: points, progress: progress),
-                  child: child,
-                ),
-              );
-            },
-            child: const SizedBox.expand(),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(RadiusTokens.lg),
+              border: Border.all(color: theme.outlineVariant.withValues(alpha: 0.4)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 900),
+              curve: Curves.easeOutCubic,
+              builder: (context, progress, child) {
+                return SizedBox(
+                  height: 240,
+                  child: CustomPaint(
+                    painter: _LinePainter(
+                      points: points,
+                      progress: progress,
+                      gridColor: theme.outlineVariant,
+                      labelColor: theme.onSurfaceVariant,
+                    ),
+                    child: child,
+                  ),
+                );
+              },
+              child: const SizedBox.expand(),
+            ),
           ),
         ],
       ),
@@ -63,6 +77,7 @@ class DonutChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     final colors = _chartColors(points.length);
     return SurfaceCard(
       child: Column(
@@ -70,25 +85,38 @@ class DonutChartCard extends StatelessWidget {
         children: [
           SectionHeader(title: title, subtitle: subtitle),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 260,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: const Duration(milliseconds: 900),
-              curve: Curves.easeOutCubic,
-              builder: (context, progress, child) {
-                return CustomPaint(
-                  painter: _DonutPainter(
-                    points: points,
-                    progress: progress,
-                    colors: colors,
-                    holeFraction: holeFraction,
+          Container(
+            decoration: BoxDecoration(
+              color: theme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(RadiusTokens.lg),
+              border: Border.all(color: theme.outlineVariant.withValues(alpha: 0.4)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              height: 260,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 900),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, progress, child) {
+                      return CustomPaint(
+                        painter: _DonutPainter(
+                          points: points,
+                          progress: progress,
+                          colors: colors,
+                          holeFraction: holeFraction,
+                          surfaceColor: theme.surface,
+                          outlineColor: theme.outlineVariant,
+                        ),
+                        child: child,
+                      );
+                    },
+                    child: const SizedBox.expand(),
                   ),
-                  child: child,
-                );
-              },
-              child: Center(
-                child: Column(
+                Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
@@ -100,12 +128,16 @@ class DonutChartCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       points.first.label,
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      style: TextStyle(
+                        color: theme.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
+          ),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -126,7 +158,12 @@ class DonutChartCard extends StatelessWidget {
   }
 
   List<Color> _chartColors(int count) {
-    final palette = [AppColors.primary, AppColors.info, AppColors.success, AppColors.warning];
+    final palette = [
+      AppColors.primary,
+      AppColors.info,
+      AppColors.success,
+      AppColors.warning,
+    ];
     return List.generate(count, (index) => palette[index % palette.length]);
   }
 }
@@ -195,11 +232,14 @@ class _MiniChartBodyState extends State<_MiniChartBody> {
                 child: Text(
                   widget.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-              StatusBadge(label: widget.type.name.toUpperCase(), color: widget.accent),
+              StatusBadge(
+                label: widget.type.name.toUpperCase(),
+                color: widget.accent,
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -241,11 +281,26 @@ class _MiniChartBodyState extends State<_MiniChartBody> {
       case ChartType.line:
         return _SmallLineChart(points: widget.points, accent: widget.accent);
       case ChartType.donut:
-        return _SmallDonutChart(points: widget.points, accent: widget.accent, hole: 0.66);
+        return _SmallDonutChart(
+          points: widget.points,
+          accent: widget.accent,
+          hole: 0.66,
+        );
       case ChartType.pie:
-        return _SmallDonutChart(points: widget.points, accent: widget.accent, hole: 0.30);
+        // A true pie hole (0.30) is too small to fit the center label
+        // without it spilling onto the colored ring, so we keep enough
+        // room for the text while still reading visibly thicker than
+        // the donut variant.
+        return _SmallDonutChart(
+          points: widget.points,
+          accent: widget.accent,
+          hole: 0.52,
+        );
       case ChartType.horizontalBar:
-        return _HorizontalBarChart(points: widget.points, accent: widget.accent);
+        return _HorizontalBarChart(
+          points: widget.points,
+          accent: widget.accent,
+        );
     }
   }
 }
@@ -257,17 +312,18 @@ class _InterpretationBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.inputBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.divider),
+        color: theme.surfaceContainer,
+        borderRadius: BorderRadius.circular(RadiusTokens.sm),
+        border: Border.all(color: theme.outlineVariant),
       ),
       child: Text(
         text,
-        style: const TextStyle(height: 1.6, fontSize: 13, color: AppColors.textPrimary),
+        style: TextStyle(height: 1.6, fontSize: 13, color: theme.onSurface),
       ),
     );
   }
@@ -286,6 +342,7 @@ class _LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -295,7 +352,10 @@ class _LegendDot extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
-        Text('$label: $value', style: const TextStyle(fontSize: 13)),
+        Text(
+          '$label: $value',
+          style: TextStyle(fontSize: 13, color: theme.onSurface),
+        ),
       ],
     );
   }
@@ -309,13 +369,53 @@ class _SmallLineChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 180,
-      child: CustomPaint(
-        painter: _LinePainter(points: points, progress: 1, accent: accent),
+    final theme = context.appTheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(RadiusTokens.lg),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
+        height: 180,
+        width: double.infinity,
+        child: CustomPaint(
+          painter: _LinePainter(
+            points: points,
+            progress: 1,
+            accent: accent,
+            gridColor: theme.outlineVariant,
+            labelColor: theme.onSurfaceVariant,
+          ),
+        ),
       ),
     );
   }
+}
+
+/// Returns one distinct color per segment so a multi-category ring is
+/// actually readable and comparable, instead of collapsing into one solid
+/// color. Five-point Likert data gets a deliberate red→green diverging
+/// scale (bad sentiment to good sentiment); anything else cycles through
+/// the standard chart palette.
+List<Color> _segmentColors(int count) {
+  if (count == 5) {
+    return const [
+      AppColors.error, // Strongly Disagree
+      AppColors.warning, // Disagree
+      AppPalette.slate400, // Neutral
+      AppColors.info, // Agree
+      AppColors.success, // Strongly Agree
+    ];
+  }
+  final palette = [
+    AppColors.primary,
+    AppColors.info,
+    AppColors.success,
+    AppColors.warning,
+    AppColors.accentPink,
+  ];
+  return List.generate(count, (i) => palette[i % palette.length]);
 }
 
 class _SmallDonutChart extends StatelessWidget {
@@ -331,46 +431,127 @@ class _SmallDonutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 180,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: const Size(180, 180),
-            painter: _DonutPainter(
-              points: points,
-              progress: 1,
-              colors: [accent],
-              holeFraction: hole,
+    final theme = context.appTheme;
+    final colors = _segmentColors(points.length);
+    // Highlight whichever category actually has the most responses —
+    // that's the useful, comparable takeaway, not just "whatever the
+    // first category happens to be".
+    var dominantIndex = 0;
+    for (var i = 1; i < points.length; i++) {
+      if (points[i].value > points[dominantIndex].value) dominantIndex = i;
+    }
+    final dominant = points[dominantIndex];
+    final dominantColor = colors[dominantIndex % colors.length];
+
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: theme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(RadiusTokens.lg),
+            border: Border.all(color: theme.outlineVariant.withValues(alpha: 0.4)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: SizedBox(
+            height: 180,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: const Size(180, 180),
+                  painter: _DonutPainter(
+                    points: points,
+                    progress: 1,
+                    colors: colors,
+                    holeFraction: hole,
+                    surfaceColor: theme.surface,
+                    outlineColor: theme.outlineVariant,
+                  ),
+                ),
+                // Constrain + scale the label to the actual hole diameter so it
+                // can never overflow onto the colored ring and overlap itself.
+                SizedBox(
+                  width: 180 * hole - 16,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${dominant.value.toStringAsFixed(0)}%',
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: dominantColor,
+                              ),
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          dominant.label,
+                          style: TextStyle(
+                            color: theme.onSurfaceVariant,
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${points.first.value.toStringAsFixed(0)}%',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 6,
+          children: [
+            for (var i = 0; i < points.length; i++)
+              _MiniLegendDot(
+                label: points[i].label,
+                color: colors[i % colors.length],
               ),
-              const Text(
-                'Completed',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-              ),
-            ],
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MiniLegendDot extends StatelessWidget {
+  const _MiniLegendDot({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.appTheme;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: TextStyle(fontSize: 10.5, color: theme.onSurfaceVariant),
+        ),
+      ],
     );
   }
 }
 
 class _HorizontalBarChart extends StatelessWidget {
-  const _HorizontalBarChart({
-    required this.points,
-    required this.accent,
-  });
+  const _HorizontalBarChart({required this.points, required this.accent});
 
   final List<ChartPoint> points;
   final Color accent;
@@ -378,27 +559,34 @@ class _HorizontalBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final max = points.map((e) => e.value).reduce(math.max);
-    return Column(
-      children: points
-          .map(
-            (point) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(
+    final theme = context.appTheme;
+    // Give this chart an explicit height (matching its sibling chart
+    // builders, which all use a fixed SizedBox) so AnimatedSwitcher never
+    // has to guess its size and every row is guaranteed to lay out fully.
+    return SizedBox(
+      height: points.length * 36.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: points
+            .map(
+              (point) => Row(
                 children: [
                   SizedBox(
                     width: 100,
                     child: Text(
                       point.label,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                      style: TextStyle(fontSize: 12, color: theme.onSurface),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
-                        value: point.value / max,
+                        value: max == 0 ? 0 : point.value / max,
                         minHeight: 12,
-                        backgroundColor: AppColors.inputBg,
+                        backgroundColor: theme.surfaceContainerHighest,
                         valueColor: AlwaysStoppedAnimation(accent),
                       ),
                     ),
@@ -409,14 +597,14 @@ class _HorizontalBarChart extends StatelessWidget {
                     child: Text(
                       point.value.toStringAsFixed(0),
                       textAlign: TextAlign.end,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                      style: TextStyle(fontSize: 12, color: theme.onSurface),
                     ),
                   ),
                 ],
               ),
-            ),
-          )
-          .toList(),
+            )
+            .toList(),
+      ),
     );
   }
 }
@@ -430,6 +618,7 @@ class _BarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final max = points.map((e) => e.value).reduce(math.max);
+    final theme = context.appTheme;
     return SizedBox(
       height: 180,
       child: Row(
@@ -442,7 +631,10 @@ class _BarChart extends StatelessWidget {
                 children: [
                   Text(
                     point.value.toStringAsFixed(0),
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   AnimatedContainer(
@@ -450,14 +642,16 @@ class _BarChart extends StatelessWidget {
                     height: 130 * (point.value / max),
                     decoration: BoxDecoration(
                       color: accent,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(10),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     point.label.split(' ').first,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 10, color: AppColors.textPrimary),
+                    style: TextStyle(fontSize: 10, color: theme.onSurface),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -476,17 +670,21 @@ class _LinePainter extends CustomPainter {
     required this.points,
     required this.progress,
     this.accent = AppColors.primary,
+    this.gridColor = AppColors.inputBorder,
+    this.labelColor = AppColors.textSecondary,
   });
 
   final List<ChartPoint> points;
   final double progress;
   final Color accent;
+  final Color gridColor;
+  final Color labelColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
 
-    const padding = 18.0;
+    const padding = 24.0;
     final plotWidth = size.width - padding * 2;
     final plotHeight = size.height - padding * 2;
     final max = points.map((e) => e.value).reduce(math.max);
@@ -494,12 +692,16 @@ class _LinePainter extends CustomPainter {
     final range = (max - min).abs() < 0.001 ? 1.0 : max - min;
 
     final gridPaint = Paint()
-      ..color = AppColors.inputBorder.withValues(alpha: 0.7)
+      ..color = gridColor.withValues(alpha: 0.7)
       ..strokeWidth = 1;
 
     for (var i = 0; i < 4; i++) {
       final y = padding + plotHeight * (i / 3);
-      canvas.drawLine(Offset(padding, y), Offset(size.width - padding, y), gridPaint);
+      canvas.drawLine(
+        Offset(padding, y),
+        Offset(size.width - padding, y),
+        gridPaint,
+      );
     }
 
     final pointsPath = Path();
@@ -556,11 +758,7 @@ class _LinePainter extends CustomPainter {
     );
 
     for (final offset in pointOffsets) {
-      canvas.drawCircle(
-        offset,
-        4.5,
-        Paint()..color = Colors.white,
-      );
+      canvas.drawCircle(offset, 4.5, Paint()..color = Colors.white);
       canvas.drawCircle(
         offset,
         6.5,
@@ -571,8 +769,8 @@ class _LinePainter extends CustomPainter {
       );
     }
 
-    final labelStyle = const TextStyle(
-      color: AppColors.textSecondary,
+    final labelStyle = TextStyle(
+      color: labelColor,
       fontSize: 10,
       fontWeight: FontWeight.w600,
     );
@@ -583,8 +781,17 @@ class _LinePainter extends CustomPainter {
         text: TextSpan(text: point.label, style: labelStyle),
         textDirection: TextDirection.ltr,
         maxLines: 1,
+        ellipsis: '…',
       )..layout(maxWidth: 48);
-      textPainter.paint(canvas, Offset(x - textPainter.width / 2, size.height - 12));
+
+      final labelX = (x - textPainter.width / 2)
+          .clamp(padding, size.width - padding - textPainter.width);
+      final labelY = size.height - padding + (padding - textPainter.height - 4) / 2;
+
+      textPainter.paint(
+        canvas,
+        Offset(labelX, labelY),
+      );
     }
   }
 
@@ -592,7 +799,9 @@ class _LinePainter extends CustomPainter {
   bool shouldRepaint(covariant _LinePainter oldDelegate) {
     return oldDelegate.points != points ||
         oldDelegate.progress != progress ||
-        oldDelegate.accent != accent;
+        oldDelegate.accent != accent ||
+        oldDelegate.gridColor != gridColor ||
+        oldDelegate.labelColor != labelColor;
   }
 }
 
@@ -602,12 +811,16 @@ class _DonutPainter extends CustomPainter {
     required this.progress,
     required this.colors,
     this.holeFraction = 0.62,
+    this.surfaceColor = AppColors.card,
+    this.outlineColor = AppColors.inputBorder,
   });
 
   final List<ChartPoint> points;
   final double progress;
   final List<Color> colors;
   final double holeFraction;
+  final Color surfaceColor;
+  final Color outlineColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -615,9 +828,14 @@ class _DonutPainter extends CustomPainter {
 
     final total = points.fold<double>(0, (sum, point) => sum + point.value);
     final center = size.center(Offset.zero);
-    final radius = math.min(size.width, size.height) / 2 - 12;
-    final paint = Paint()..style = PaintingStyle.stroke..strokeWidth = radius * (1 - holeFraction);
-    final rect = Rect.fromCircle(center: center, radius: radius);
+    final baseRadius = math.min(size.width, size.height) / 2 - 12;
+    final strokeWidth = baseRadius * (1 - holeFraction);
+    final ringRadius = baseRadius - strokeWidth / 2;
+    final holeRadius = baseRadius - strokeWidth;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+    final rect = Rect.fromCircle(center: center, radius: ringRadius);
     var start = -math.pi / 2;
 
     for (var i = 0; i < points.length; i++) {
@@ -629,14 +847,14 @@ class _DonutPainter extends CustomPainter {
 
     canvas.drawCircle(
       center,
-      radius * holeFraction,
-      Paint()..color = AppColors.card,
+      holeRadius,
+      Paint()..color = surfaceColor,
     );
     canvas.drawCircle(
       center,
-      radius * holeFraction,
+      holeRadius,
       Paint()
-        ..color = AppColors.inputBorder.withValues(alpha: 0.8)
+        ..color = outlineColor.withValues(alpha: 0.8)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );
@@ -647,6 +865,8 @@ class _DonutPainter extends CustomPainter {
     return oldDelegate.points != points ||
         oldDelegate.progress != progress ||
         oldDelegate.colors != colors ||
-        oldDelegate.holeFraction != holeFraction;
+        oldDelegate.holeFraction != holeFraction ||
+        oldDelegate.surfaceColor != surfaceColor ||
+        oldDelegate.outlineColor != outlineColor;
   }
 }

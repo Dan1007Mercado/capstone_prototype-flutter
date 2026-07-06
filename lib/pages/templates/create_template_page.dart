@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../mock/mock_data.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
-import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
 class CreateTemplatePage extends StatefulWidget {
@@ -18,74 +17,99 @@ enum TemplateBuilderMode { create, edit, preview }
 class _CreateTemplatePageState extends State<CreateTemplatePage> {
   TemplateStyle _style = TemplateStyle.traditional;
 
+  static const Color _pageBg = Color(0xFFF4F7F8);
+  static const Color _cardWhite = Color(0xFFFFFFFF);
+  static const Color _border = Color(0xFFDDECEF);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Template')),
+      backgroundColor: _pageBg,
+      appBar: AppBar(
+        title: const Text('Create Template'),
+        backgroundColor: _cardWhite,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionHeader(
-                  title: 'Step 1',
-                  subtitle: 'Select template style before entering the builder.',
-                ),
-                const SizedBox(height: 16),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth > 760;
-                    final children = [
-                      _StyleOptionCard(
-                        title: 'Traditional Form',
-                        subtitle: 'Question 1, Question 2, Question 3, Question 4',
-                        selected: _style == TemplateStyle.traditional,
-                        onTap: () => setState(() => _style = TemplateStyle.traditional),
-                      ),
-                      _StyleOptionCard(
-                        title: 'Card Per Page',
-                        subtitle: 'One Question per screen',
-                        selected: _style == TemplateStyle.cardPerPage,
-                        onTap: () => setState(() => _style = TemplateStyle.cardPerPage),
-                      ),
-                    ];
+          _buildStyleSelectionCard(),
+        ],
+      ),
+    );
+  }
 
-                    if (wide) {
-                      return Row(
-                        children: [
-                          Expanded(child: children[0]),
-                          const SizedBox(width: 16),
-                          Expanded(child: children[1]),
-                        ],
-                      );
-                    }
-
-                    return Column(
-                      children: [
-                        children[0],
-                        const SizedBox(height: 16),
-                        children[1],
-                      ],
-                    );
-                  },
+  Widget _buildStyleSelectionCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _cardWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionHeader(
+            title: 'Step 1',
+            subtitle: 'Select template style before entering the builder.',
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 760;
+              final children = [
+                _StyleOptionCard(
+                  title: 'Traditional Form',
+                  subtitle: 'Question 1, Question 2, Question 3, Question 4',
+                  selected: _style == TemplateStyle.traditional,
+                  onTap: () => setState(() => _style = TemplateStyle.traditional),
                 ),
-                const SizedBox(height: 18),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FilledButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => TemplateBuilderPage(style: _style),
-                        ),
-                      );
-                    },
-                    child: const Text('Proceed to Template Builder'),
+                _StyleOptionCard(
+                  title: 'Card Per Page',
+                  subtitle: 'One Question per screen',
+                  selected: _style == TemplateStyle.cardPerPage,
+                  onTap: () => setState(() => _style = TemplateStyle.cardPerPage),
+                ),
+              ];
+
+              if (wide) {
+                return Row(
+                  children: [
+                    Expanded(child: children[0]),
+                    const SizedBox(width: 16),
+                    Expanded(child: children[1]),
+                  ],
+                );
+              }
+
+              return Column(
+                children: [
+                  children[0],
+                  const SizedBox(height: 16),
+                  children[1],
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 18),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => TemplateBuilderPage(style: _style),
                   ),
-                ),
-              ],
+                );
+              },
+              child: const Text('Proceed to Template Builder'),
             ),
           ),
         ],
@@ -120,6 +144,14 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
   late final TextEditingController _scaleValuesController;
   final _components = <TemplateComponent>[];
   int _selectedIndex = 0;
+
+  static const Color _tealDark = Color(0xFF0F9B9B);
+  static const Color _mintChipBg = Color(0xFFDFF5F3);
+  static const Color _pageBg = Color(0xFFF4F7F8);
+  static const Color _cardWhite = Color(0xFFFFFFFF);
+  static const Color _headingText = Color(0xFF0E2A2E);
+  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _border = Color(0xFFDDECEF);
 
   bool get _canEdit => widget.mode != TemplateBuilderMode.preview;
 
@@ -201,10 +233,16 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
             : 'Template Builder';
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      backgroundColor: _pageBg,
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: _cardWhite,
+      ),
       floatingActionButton: widget.mode == TemplateBuilderMode.preview
           ? null
           : FloatingActionButton.extended(
+              backgroundColor: _tealDark,
+              foregroundColor: Colors.white,
               onPressed: _showAddComponentSheet,
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Add Component'),
@@ -212,27 +250,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SectionHeader(
-                  title: 'Builder',
-                  subtitle: widget.style == TemplateStyle.traditional
-                      ? 'Traditional Form layout with grouped components.'
-                      : 'Card Per Page layout with one question per screen.',
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Template Name',
-                    prefixIcon: Icon(Icons.edit_outlined, size: 20),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildTemplateNameCard(),
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
@@ -305,8 +323,58 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
     );
   }
 
+  Widget _buildTemplateNameCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _cardWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(
+            title: 'Builder',
+            subtitle: widget.style == TemplateStyle.traditional
+                ? 'Traditional Form layout with grouped components.'
+                : 'Card Per Page layout with one question per screen.',
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: 'Template Name',
+              prefixIcon: Icon(Icons.edit_outlined, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildComponentList(BuildContext context) {
-    return SurfaceCard(
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _cardWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -339,10 +407,10 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: selected ? AppColors.surface : AppColors.inputBg,
+                      color: selected ? const Color(0xFFF8FCFD) : _pageBg,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: selected ? AppColors.primary : AppColors.divider,
+                        color: selected ? _tealDark : _border,
                         width: selected ? 1.5 : 0.5,
                       ),
                     ),
@@ -350,7 +418,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                       children: [
                         ReorderableDragStartListener(
                           index: index,
-                          child: Icon(Icons.drag_indicator, color: AppColors.textSecondary),
+                          child: Icon(Icons.drag_indicator, color: _bodyText),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -359,18 +427,18 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                             children: [
                               Text(
                                 component.label,
-                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: _headingText),
                               ),
                               const SizedBox(height: 3),
                               Text(
                                 component.type,
-                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                                style: const TextStyle(color: _bodyText, fontSize: 12),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(width: 8),
-                        AccentChip(label: component.category, color: AppColors.primary),
+                        _CategoryChip(label: component.category),
                         const SizedBox(width: 8),
                         if (_canEdit)
                           IconButton(
@@ -385,7 +453,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                                 }
                               });
                             },
-                            icon: const Icon(Icons.delete_outline, size: 18),
+                            icon: const Icon(Icons.delete_outline, size: 18, color: _bodyText),
                           ),
                       ],
                     ),
@@ -405,7 +473,20 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
     final showScaleValues = _isLikertType(component.type);
     final showPlaceholder = _isTextInputType(component.type);
 
-    return SurfaceCard(
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _cardWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -444,18 +525,19 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
             contentPadding: EdgeInsets.zero,
             title: const Text('Required'),
             value: component.isRequired,
+            activeThumbColor: _tealDark,
             onChanged: _canEdit
                 ? (value) => _updateSelectedComponent((current) => current.copyWith(isRequired: value))
                 : null,
           ),
           if (showChoices) ...[
             const SizedBox(height: 12),
-            const Text('Choices', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+            const Text('Choices', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: _headingText)),
             const SizedBox(height: 8),
             if (component.choices.isEmpty)
               Text(
                 _canEdit ? 'No choices added yet.' : 'No choices defined.',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                style: const TextStyle(color: _bodyText, fontSize: 13),
               )
             else
               Wrap(
@@ -468,6 +550,8 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                       (entry) => Chip(
                         label: Text('${entry.key + 1}. ${entry.value}'),
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        backgroundColor: _mintChipBg,
+                        side: BorderSide.none,
                       ),
                     )
                     .toList(),
@@ -478,6 +562,10 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                 onPressed: _showAddChoiceDialog,
                 icon: const Icon(Icons.add_circle_outline, size: 18),
                 label: const Text('Add Choice'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _tealDark,
+                  side: BorderSide(color: _tealDark.withValues(alpha: 0.3)),
+                ),
               ),
           ],
           if (showScaleValues) ...[
@@ -520,7 +608,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
             const SizedBox(height: 12),
             Text(
               'This component has no additional configuration fields.',
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              style: const TextStyle(color: _bodyText, fontSize: 13),
             ),
           ],
         ],
@@ -640,7 +728,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.background,
+      backgroundColor: _cardWhite,
       isScrollControlled: true,
       builder: (context) {
         return DraggableScrollableSheet(
@@ -657,11 +745,20 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                   'Add Component',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
+                        color: _headingText,
                       ),
                 ),
                 const SizedBox(height: 16),
                 for (final entry in groupedComponents.entries) ...[
-                  Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textSecondary, letterSpacing: 0.5)),
+                  Text(
+                    entry.key,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: _bodyText,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 10,
@@ -670,6 +767,8 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                         .map(
                           (componentName) => ActionChip(
                             label: Text(componentName),
+                            backgroundColor: _mintChipBg,
+                            side: BorderSide.none,
                             onPressed: () {
                               setState(() {
                                 _components.add(
@@ -712,6 +811,12 @@ class _StyleOptionCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  static const Color _tealDark = Color(0xFF0F9B9B);
+  static const Color _border = Color(0xFFDDECEF);
+  static const Color _pageBg = Color(0xFFF4F7F8);
+  static const Color _headingText = Color(0xFF0E2A2E);
+  static const Color _bodyText = Color(0xFF7C8A90);
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -721,10 +826,10 @@ class _StyleOptionCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: selected ? AppColors.surface : AppColors.inputBg,
+          color: selected ? const Color(0xFFF8FCFD) : _pageBg,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.divider,
+            color: selected ? _tealDark : _border,
             width: selected ? 1.5 : 0.5,
           ),
         ),
@@ -736,18 +841,47 @@ class _StyleOptionCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: _headingText),
                   ),
                 ),
-                if (selected) const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
+                if (selected) const Icon(Icons.check_circle, color: _tealDark, size: 22),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: const TextStyle(color: AppColors.textSecondary, height: 1.5, fontSize: 13),
+              style: const TextStyle(color: _bodyText, height: 1.5, fontSize: 13),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({required this.label});
+
+  final String label;
+
+  static const Color _mintChipBg = Color(0xFFDFF5F3);
+  static const Color _iconTeal = Color(0xFF14B8A6);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: _mintChipBg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: _iconTeal,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.3,
         ),
       ),
     );

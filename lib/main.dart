@@ -25,7 +25,9 @@ class _TalaanScanAppState extends State<TalaanScanApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'TalaanScan',
-        theme: buildAppTheme(Brightness.dark),
+        theme: buildAppTheme(Brightness.light),
+        darkTheme: buildAppTheme(Brightness.dark),
+        themeMode: ThemeMode.system,
         home: const SplashLanding(),
       ),
     );

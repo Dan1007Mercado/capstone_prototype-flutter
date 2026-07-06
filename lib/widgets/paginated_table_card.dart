@@ -52,6 +52,8 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
   @override
   Widget build(BuildContext context) {
     final rows = _visibleRows;
+    final compact = MediaQuery.sizeOf(context).width < 640;
+    final theme = context.appTheme;
 
     return SurfaceCard(
       child: Column(
@@ -65,15 +67,31 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
               child: Center(
                 child: Column(
                   children: [
-                    Icon(Icons.table_rows_outlined, size: 40, color: AppColors.textDisabled),
+                    Icon(
+                      Icons.table_rows_outlined,
+                      size: 40,
+                      color: AppColors.textDisabled,
+                    ),
                     SizedBox(height: 12),
                     Text(
                       'No records available.',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
               ),
+            )
+          else if (compact)
+            Column(
+              children: [
+                for (final row in rows) ...[
+                  _MobileDataRow(columns: widget.columns, row: row),
+                  if (row != rows.last) const SizedBox(height: 10),
+                ],
+              ],
             )
           else
             SingleChildScrollView(
@@ -97,7 +115,7 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
               children: [
                 Text(
                   'Page ${_page + 1} of $_totalPages',
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                  style: TextStyle(color: theme.onSurfaceVariant, fontSize: 13),
                 ),
                 const Spacer(),
                 TextButton.icon(
@@ -109,7 +127,10 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
                 FilledButton(
                   onPressed: _nextPage,
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -125,6 +146,74 @@ class _PaginatedTableCardState extends State<PaginatedTableCard> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _MobileDataRow extends StatelessWidget {
+  const _MobileDataRow({required this.columns, required this.row});
+
+  final List<DataColumn> columns;
+  final DataRow row;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.appTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: theme.surfaceContainer,
+        borderRadius: BorderRadius.circular(RadiusTokens.sm),
+        border: Border.all(color: theme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < row.cells.length && i < columns.length; i++) ...[
+            _MobileDataField(
+              label: columns[i].label,
+              value: row.cells[i].child,
+            ),
+            if (i != row.cells.length - 1)
+              Divider(height: 18, color: theme.outlineVariant),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MobileDataField extends StatelessWidget {
+  const _MobileDataField({required this.label, required this.value});
+
+  final Widget label;
+  final Widget value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.appTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DefaultTextStyle.merge(
+          style: TextStyle(
+            color: theme.onSurfaceVariant,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+          child: label,
+        ),
+        const SizedBox(height: 6),
+        DefaultTextStyle.merge(
+          style: TextStyle(
+            color: theme.onSurface,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+          child: value,
+        ),
+      ],
     );
   }
 }

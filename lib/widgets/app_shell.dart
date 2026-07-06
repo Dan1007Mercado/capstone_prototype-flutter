@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_models.dart';
 import '../pages/analytics/analytics_page.dart';
@@ -13,6 +14,12 @@ import '../pages/templates/templates_page.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 
+// ── Brand palette (matches login/signup/dashboard) ─────────────────────────
+class _ShellColors {
+  static const Color tealDark = Color(0xFF0F9B9B);
+  static const Color tealLight = Color(0xFF2DD4CF);
+}
+
 class AppShell extends StatefulWidget {
   const AppShell({super.key, this.initialIndex = 0});
 
@@ -24,13 +31,6 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   late int _index;
-
-  final _titles = const <String>[
-    'Dashboard',
-    'Surveys',
-    'Templates',
-    'Survey Converter',
-  ];
 
   @override
   void initState() {
@@ -47,33 +47,28 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _openCreateTemplate() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const CreateTemplatePage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const CreateTemplatePage()));
   }
 
   void _openSurveyConverter() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const SurveyConverterPage(),
-      ),
+      MaterialPageRoute<void>(builder: (_) => const SurveyConverterPage()),
     );
   }
 
   void _openDeploySurvey() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const DeploySurveyPage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const DeploySurveyPage()));
   }
 
   void _showNotifications(AppState appState) {
+    final theme = context.appTheme;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.surface,
       showDragHandle: true,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -94,9 +89,11 @@ class _AppShellState extends State<AppShell> {
                   children: [
                     Text(
                       'Notifications',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: theme.onSurface,
+                      ),
                     ),
                     const Spacer(),
                     if (appState.notifications.isNotEmpty)
@@ -105,20 +102,32 @@ class _AppShellState extends State<AppShell> {
                           appState.markNotificationsRead();
                           Navigator.pop(context);
                         },
-                        child: const Text('Mark all read'),
+                        child: Text(
+                          'Mark all read',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 if (appState.notifications.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Center(
                       child: Column(
                         children: [
-                          Icon(Icons.notifications_none_outlined, size: 48, color: AppColors.textDisabled),
-                          SizedBox(height: 12),
-                          Text('No notifications yet.', style: TextStyle(color: AppColors.textSecondary)),
+                          const Icon(
+                            Icons.notifications_none_outlined,
+                            size: 48,
+                            color: AppColors.textDisabled,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No notifications yet.',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -137,16 +146,27 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _showSettings() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const SettingsPage()));
+  }
+
+  void _handleNotifications() {
+    final appState = AppStateScope.of(context);
+    appState.markNotificationsRead();
+    _showNotifications(appState);
   }
 
   Future<void> _showScanner() async {
     final appState = AppStateScope.of(context);
     if (appState.surveys.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Create or deploy a survey before opening the scanner.')),
+        SnackBar(
+          content: Text(
+            'Create or deploy a survey before opening the scanner.',
+            style: GoogleFonts.inter(color: Colors.white),
+          ),
+        ),
       );
       return;
     }
@@ -159,26 +179,30 @@ class _AppShellState extends State<AppShell> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Select Survey'),
+              title: Text(
+                'Select Survey',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Choose the survey that will be used for OMR scanning.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                    style: GoogleFonts.inter(color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<SurveyRecord>(
                     initialValue: selected,
                     isExpanded: true,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Survey',
+                      labelStyle: GoogleFonts.inter(),
                     ),
                     items: [
                       for (final survey in appState.surveys)
                         DropdownMenuItem<SurveyRecord>(
                           value: survey,
-                          child: Text(survey.name),
+                          child: Text(survey.name, style: GoogleFonts.inter()),
                         ),
                     ],
                     onChanged: (value) {
@@ -191,11 +215,17 @@ class _AppShellState extends State<AppShell> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel'),
+                  child: Text('Cancel', style: GoogleFonts.inter()),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(dialogContext, selected),
-                  child: const Text('Continue'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _ShellColors.tealDark,
+                  ),
+                  child: Text(
+                    'Continue',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             );
@@ -221,35 +251,34 @@ class _AppShellState extends State<AppShell> {
       children: [
         Scaffold(
           extendBody: true,
-          appBar: AppBar(
-            title: Text(_titles[_index]),
-            actions: [
-              _IconBadgeButton(
-                icon: Icons.notifications_outlined,
-                tooltip: 'Notifications',
-                badgeCount: appState.unreadNotifications,
-                onPressed: () {
-                  appState.markNotificationsRead();
-                  _showNotifications(appState);
-                },
-              ),
-              IconButton(
-                onPressed: _showSettings,
-                icon: const Icon(Icons.settings_outlined),
-                tooltip: 'Settings',
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
+          extendBodyBehindAppBar: false,
           body: Padding(
             padding: const EdgeInsets.only(bottom: 104),
             child: IndexedStack(
               index: _index,
               children: [
-                DashboardPage(onOpenAnalytics: _openAnalytics),
-                SurveysPage(onOpenAnalytics: _openAnalytics),
-                const TemplatesPage(),
-                const SurveyConverterPage(),
+                DashboardPage(
+                  onOpenAnalytics: _openAnalytics,
+                  onNotifications: _handleNotifications,
+                  onSettings: _showSettings,
+                  unreadNotifications: appState.unreadNotifications,
+                ),
+                SurveysPage(
+                  onOpenAnalytics: _openAnalytics,
+                  onNotifications: _handleNotifications,
+                  onSettings: _showSettings,
+                  unreadNotifications: appState.unreadNotifications,
+                ),
+                TemplatesPage(
+                  onNotifications: _handleNotifications,
+                  onSettings: _showSettings,
+                  unreadNotifications: appState.unreadNotifications,
+                ),
+                SurveyConverterPage(
+                  onNotifications: _handleNotifications,
+                  onSettings: _showSettings,
+                  unreadNotifications: appState.unreadNotifications,
+                ),
               ],
             ),
           ),
@@ -266,10 +295,18 @@ class _AppShellState extends State<AppShell> {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: AppColors.card,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: AppColors.divider),
-                        boxShadow: AppColors.shadowLg,
+                        color: context.surface,
+                        borderRadius: BorderRadius.circular(RadiusTokens.lg),
+                        border: Border.all(color: context.outlineVariant),
+                        boxShadow: [
+                          BoxShadow(
+                            color: context.appTheme.shadow.withValues(
+                              alpha: context.isDark ? 0.28 : 0.10,
+                            ),
+                            blurRadius: 28,
+                            offset: const Offset(0, 12),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -311,18 +348,29 @@ class _AppShellState extends State<AppShell> {
                         height: 60,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [AppColors.primary, AppColors.primaryHover],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              _ShellColors.tealDark,
+                              _ShellColors.tealLight,
+                            ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.35),
+                              color: _ShellColors.tealDark.withValues(
+                                alpha: 0.35,
+                              ),
                               blurRadius: 18,
                               offset: const Offset(0, 8),
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.document_scanner_outlined, size: 28, color: Colors.white),
+                        child: const Icon(
+                          Icons.document_scanner_outlined,
+                          size: 28,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -360,7 +408,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.primary : AppColors.textSecondary;
+    final theme = context.appTheme;
+    final color = selected ? _ShellColors.tealDark : theme.onSurfaceVariant;
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -372,7 +421,7 @@ class _NavItem extends StatelessWidget {
             const SizedBox(height: 5),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.inter(
                 color: color,
                 fontSize: 11,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
@@ -393,12 +442,13 @@ class _NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        color: theme.surfaceContainer,
+        borderRadius: BorderRadius.circular(RadiusTokens.md),
+        border: Border.all(color: theme.outlineVariant),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,10 +457,10 @@ class _NotificationTile extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
+              color: _ShellColors.tealDark.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(RadiusTokens.sm),
             ),
-            child: Icon(item.icon, color: AppColors.primary, size: 20),
+            child: Icon(item.icon, color: _ShellColors.tealDark, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -419,17 +469,26 @@ class _NotificationTile extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item.subtitle,
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                  style: GoogleFonts.inter(
+                    color: theme.onSurfaceVariant,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   item.time,
-                  style: const TextStyle(color: AppColors.textDisabled, fontSize: 12),
+                  style: GoogleFonts.inter(
+                    color: theme.onSurfaceVariant.withValues(alpha: 0.72),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -446,12 +505,14 @@ class _IconBadgeButton extends StatelessWidget {
     required this.tooltip,
     required this.onPressed,
     required this.badgeCount,
+    this.color,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback onPressed;
   final int badgeCount;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -460,7 +521,7 @@ class _IconBadgeButton extends StatelessWidget {
       children: [
         IconButton(
           onPressed: onPressed,
-          icon: Icon(icon),
+          icon: Icon(icon, color: color),
           tooltip: tooltip,
         ),
         if (badgeCount > 0)
@@ -472,11 +533,15 @@ class _IconBadgeButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.error,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: AppColors.error, width: 1.5),
+                border: Border.all(color: Colors.white, width: 1.5),
               ),
               child: Text(
                 badgeCount > 9 ? '9+' : '$badgeCount',
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -498,7 +563,8 @@ class GlobalFloatingActionMenu extends StatefulWidget {
   final VoidCallback onConvertQuestionnaire;
 
   @override
-  State<GlobalFloatingActionMenu> createState() => _GlobalFloatingActionMenuState();
+  State<GlobalFloatingActionMenu> createState() =>
+      _GlobalFloatingActionMenuState();
 }
 
 class _GlobalFloatingActionMenuState extends State<GlobalFloatingActionMenu> {
@@ -555,7 +621,7 @@ class _GlobalFloatingActionMenuState extends State<GlobalFloatingActionMenu> {
           ),
           FloatingActionButton(
             onPressed: _toggle,
-            backgroundColor: AppColors.primary,
+            backgroundColor: _ShellColors.tealDark,
             foregroundColor: Colors.white,
             elevation: 4,
             child: AnimatedRotation(
@@ -589,6 +655,7 @@ class _DialActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.appTheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -597,19 +664,30 @@ class _DialActionTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.divider),
-            boxShadow: AppColors.shadowMd,
+            color: theme.surface,
+            borderRadius: BorderRadius.circular(RadiusTokens.md),
+            border: Border.all(color: theme.outlineVariant),
+            boxShadow: [
+              BoxShadow(
+                color: theme.shadow.withValues(
+                  alpha: context.isDark ? 0.22 : 0.10,
+                ),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(action.icon, size: 18, color: AppColors.primaryHover),
+              Icon(action.icon, size: 18, color: _ShellColors.tealDark),
               const SizedBox(width: 10),
               Text(
                 action.label,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -618,4 +696,3 @@ class _DialActionTile extends StatelessWidget {
     );
   }
 }
-

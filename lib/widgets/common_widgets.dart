@@ -1,41 +1,162 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_theme.dart';
+
+class PageHeader extends StatelessWidget {
+  const PageHeader({
+    super.key,
+    required this.title,
+    this.onNotifications,
+    this.onSettings,
+    this.unreadNotifications = 0,
+  });
+
+  final String title;
+  final VoidCallback? onNotifications;
+  final VoidCallback? onSettings;
+  final int unreadNotifications;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.appTheme;
+
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppPalette.teal600, AppPalette.teal400],
+          ),
+          borderRadius: BorderRadius.circular(RadiusTokens.lg),
+          boxShadow: [
+            BoxShadow(
+              color: theme.shadow.withValues(alpha: context.isDark ? 0.22 : 0.14),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ),
+            if (onNotifications != null)
+              _HeaderIconButton(
+                icon: Icons.notifications_outlined,
+                tooltip: 'Notifications',
+                badgeCount: unreadNotifications,
+                onPressed: onNotifications!,
+              ),
+            if (onSettings != null) ...[
+              const SizedBox(width: 4),
+              _HeaderIconButton(
+                icon: Icons.settings_outlined,
+                tooltip: 'Settings',
+                onPressed: onSettings!,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderIconButton extends StatelessWidget {
+  const _HeaderIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.badgeCount = 0,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+  final int badgeCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        IconButton(
+          onPressed: onPressed,
+          tooltip: tooltip,
+          icon: Icon(icon, color: Colors.white, size: 22),
+        ),
+        if (badgeCount > 0)
+          Positioned(
+            right: 6,
+            top: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              child: Text(
+                badgeCount > 9 ? '9+' : '$badgeCount',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
 
 class SurfaceCard extends StatelessWidget {
   const SurfaceCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
+    this.color,
   });
 
   final Widget child;
   final EdgeInsets padding;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.appTheme;
     return Container(
       decoration: BoxDecoration(
-        color: theme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: color ?? theme.surface,
+        borderRadius: BorderRadius.circular(RadiusTokens.md),
         border: Border.all(color: theme.outlineVariant, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: theme.shadow.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: theme.shadow.withValues(alpha: context.isDark ? 0.16 : 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(RadiusTokens.md),
         child: Material(
           color: Colors.transparent,
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
+          child: Padding(padding: padding, child: child),
         ),
       ),
     );
@@ -67,17 +188,17 @@ class SectionHeader extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
               ),
               if (subtitle != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   subtitle!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: theme.onSurfaceVariant,
-                      ),
+                    color: theme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ],
@@ -113,16 +234,18 @@ class StatCard extends StatelessWidget {
     return Transform.scale(
       scale: scale,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(SpacingTokens.lg),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(RadiusTokens.md),
           color: theme.surface,
           border: Border.all(color: theme.outlineVariant, width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: theme.shadow.withValues(alpha: 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: theme.shadow.withValues(
+                alpha: context.isDark ? 0.16 : 0.06,
+              ),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -136,9 +259,9 @@ class StatCard extends StatelessWidget {
                   child: Text(
                     label,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: theme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: theme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -146,7 +269,7 @@ class StatCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(RadiusTokens.sm),
                     color: accent.withValues(alpha: 0.15),
                   ),
                   child: Icon(icon, color: accent, size: 20),
@@ -157,16 +280,16 @@ class StatCard extends StatelessWidget {
             Text(
               value,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
-                  ),
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.4,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
               delta,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: theme.onSurfaceVariant,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: theme.onSurfaceVariant),
             ),
           ],
         ),
@@ -176,11 +299,7 @@ class StatCard extends StatelessWidget {
 }
 
 class StatusBadge extends StatelessWidget {
-  const StatusBadge({
-    super.key,
-    required this.label,
-    required this.color,
-  });
+  const StatusBadge({super.key, required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -191,7 +310,7 @@ class StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(RadiusTokens.xs),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
@@ -226,10 +345,8 @@ class ChartToggle extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: selected ? theme.primary : theme.surfaceContainer,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: selected ? theme.primary : theme.outline,
-        ),
+        borderRadius: BorderRadius.circular(RadiusTokens.xs),
+        border: Border.all(color: selected ? theme.primary : theme.outline),
       ),
       child: InkWell(
         onTap: onTap,
@@ -251,11 +368,7 @@ class ChartToggle extends StatelessWidget {
 }
 
 class AccentChip extends StatelessWidget {
-  const AccentChip({
-    super.key,
-    required this.label,
-    required this.color,
-  });
+  const AccentChip({super.key, required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -266,7 +379,7 @@ class AccentChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(RadiusTokens.xs),
       ),
       child: Text(
         label,
@@ -282,11 +395,7 @@ class AccentChip extends StatelessWidget {
 }
 
 class DetailRow extends StatelessWidget {
-  const DetailRow({
-    super.key,
-    required this.label,
-    required this.value,
-  });
+  const DetailRow({super.key, required this.label, required this.value});
 
   final String label;
   final String value;

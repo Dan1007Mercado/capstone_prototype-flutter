@@ -312,6 +312,19 @@ class QuestionInsight {
   final String interpretation;
 }
 
+/// A typed model for OMR survey sections used in PDF generation.
+class SurveySection {
+  const SurveySection({
+    required this.title,
+    required this.startNumber,
+    required this.questions,
+  });
+
+  final String title;
+  final int startNumber;
+  final List<String> questions;
+}
+
 String shortStatusLabel(SurveyStatus status) {
   switch (status) {
     case SurveyStatus.active:

@@ -1,63 +1,67 @@
 import 'package:flutter/material.dart';
 
 // ─── Color Palettes ──────────────────────────────────────────────────────────
+// "Blue Business" palette — light, clean fintech/dashboard style.
+// Primary Blue #5B7FFF → Deep Blue-Violet #4A5FE8, Mint Green #4CD9A8,
+// Soft Lavender #EDEFFF, Charcoal #2E2E3A, Gray #9A9BA8, Coral Pink #FF6B81,
+// Sky Blue #4FC3F7.
 
 class AppPalette {
-  // Indigo Primary
-  static const primary50 = Color(0xFFEEF2FF);
-  static const primary100 = Color(0xFFE0E7FF);
-  static const primary200 = Color(0xFFC7D2FE);
-  static const primary300 = Color(0xFFA5B4FC);
-  static const primary400 = Color(0xFF818CF8);
-  static const primary500 = Color(0xFF6366F1);
-  static const primary600 = Color(0xFF4F46E5);
-  static const primary700 = Color(0xFF4338CA);
-  static const primary800 = Color(0xFF3730A3);
-  static const primary900 = Color(0xFF312E81);
+  // Blue Primary
+  static const primary50 = Color(0xFFF3F5FF);
+  static const primary100 = Color(0xFFE3E8FF);
+  static const primary200 = Color(0xFFC7D2FF);
+  static const primary300 = Color(0xFFA3B1FF);
+  static const primary400 = Color(0xFF7B8CFF);
+  static const primary500 = Color(0xFF5B7FFF);
+  static const primary600 = Color(0xFF4A5FE8);
+  static const primary700 = Color(0xFF3A4BC0);
+  static const primary800 = Color(0xFF2E3B99);
+  static const primary900 = Color(0xFF232D73);
 
-  // Teal Secondary
-  static const teal50 = Color(0xFFF0FDFA);
-  static const teal100 = Color(0xFFCCFBF1);
-  static const teal200 = Color(0xFF99F6E4);
-  static const teal300 = Color(0xFF5EEAD4);
-  static const teal400 = Color(0xFF2DD4BF);
-  static const teal500 = Color(0xFF14B8A6);
-  static const teal600 = Color(0xFF0D9488);
-  static const teal700 = Color(0xFF0F766E);
-  static const teal800 = Color(0xFF115E59);
-  static const teal900 = Color(0xFF134E4A);
+  // Mint Secondary
+  static const teal50 = Color(0xFFEAFBF5);
+  static const teal100 = Color(0xFFCDF6E7);
+  static const teal200 = Color(0xFF9BEDCE);
+  static const teal300 = Color(0xFF6FE4B9);
+  static const teal400 = Color(0xFF4CD9A8);
+  static const teal500 = Color(0xFF34C795);
+  static const teal600 = Color(0xFF22A67D);
+  static const teal700 = Color(0xFF1B8566);
+  static const teal800 = Color(0xFF166B54);
+  static const teal900 = Color(0xFF124F3F);
 
-  // Slate Neutral
-  static const slate50 = Color(0xFFF8FAFC);
-  static const slate100 = Color(0xFFF1F5F9);
-  static const slate200 = Color(0xFFE2E8F0);
-  static const slate300 = Color(0xFFCBD5E1);
-  static const slate400 = Color(0xFF94A3B8);
-  static const slate500 = Color(0xFF64748B);
-  static const slate600 = Color(0xFF475569);
-  static const slate700 = Color(0xFF334155);
-  static const slate800 = Color(0xFF1E293B);
-  static const slate850 = Color(0xFF172033);
-  static const slate900 = Color(0xFF0F172A);
-  static const slate950 = Color(0xFF020617);
+  // Slate Neutral (charcoal / gray / soft lavender)
+  static const slate50 = Color(0xFFF8F9FD);
+  static const slate100 = Color(0xFFEDEFFF);
+  static const slate200 = Color(0xFFDBDEF0);
+  static const slate300 = Color(0xFFC2C4D6);
+  static const slate400 = Color(0xFF9A9BA8);
+  static const slate500 = Color(0xFF7D7E8C);
+  static const slate600 = Color(0xFF5F6070);
+  static const slate700 = Color(0xFF454654);
+  static const slate800 = Color(0xFF2E2E3A);
+  static const slate850 = Color(0xFF23232D);
+  static const slate900 = Color(0xFF1A1A22);
+  static const slate950 = Color(0xFF12121A);
 
   // Semantic
-  static const success = Color(0xFF10B981);
-  static const successLight = Color(0xFFD1FAE5);
-  static const successDark = Color(0xFF064E3B);
+  static const success = Color(0xFF4CD9A8);
+  static const successLight = Color(0xFFCDF6E7);
+  static const successDark = Color(0xFF124F3F);
   static const warning = Color(0xFFF59E0B);
   static const warningLight = Color(0xFFFEF3C7);
   static const warningDark = Color(0xFF78350F);
-  static const error = Color(0xFFEF4444);
-  static const errorLight = Color(0xFFFEE2E2);
-  static const errorDark = Color(0xFF7F1D1D);
-  static const info = Color(0xFF3B82F6);
-  static const infoLight = Color(0xFFDBEAFE);
-  static const infoDark = Color(0xFF1E3A8A);
+  static const error = Color(0xFFFF6B81);
+  static const errorLight = Color(0xFFFFE1E6);
+  static const errorDark = Color(0xFF7A1F3D);
+  static const info = Color(0xFF4FC3F7);
+  static const infoLight = Color(0xFFE1F5FE);
+  static const infoDark = Color(0xFF1B4B66);
 
   // Accent
-  static const pink = Color(0xFFEC4899);
-  static const purple = Color(0xFF8B5CF6);
+  static const pink = Color(0xFFFF6B81);
+  static const purple = Color(0xFF7B8CFF);
   static const orange = Color(0xFFF97316);
   static const amber = Color(0xFFF59E0B);
 }
@@ -65,19 +69,19 @@ class AppPalette {
 // ─── Backward-compatible AppColors ───────────────────────────────────────────
 
 class AppColors {
-  static const background = AppPalette.slate950;
-  static const card = AppPalette.slate900;
-  static const surface = AppPalette.slate800;
-  static const surfaceElevated = Color(0xFF1E293B);
-  static const primary = AppPalette.primary400;
-  static const primaryHover = AppPalette.primary300;
-  static const primaryPressed = AppPalette.primary500;
-  static const primaryContainer = AppPalette.primary800;
-  static const textPrimary = AppPalette.slate100;
+  static const background = AppPalette.slate50;
+  static const card = Colors.white;
+  static const surface = AppPalette.slate100;
+  static const surfaceElevated = Colors.white;
+  static const primary = AppPalette.primary500;
+  static const primaryHover = AppPalette.primary400;
+  static const primaryPressed = AppPalette.primary600;
+  static const primaryContainer = AppPalette.primary100;
+  static const textPrimary = AppPalette.slate800;
   static const textSecondary = AppPalette.slate400;
-  static const textDisabled = AppPalette.slate500;
-  static const inputBg = AppPalette.slate800;
-  static const inputBorder = AppPalette.slate700;
+  static const textDisabled = AppPalette.slate300;
+  static const inputBg = Colors.white;
+  static const inputBorder = AppPalette.slate200;
   static const success = AppPalette.success;
   static const error = AppPalette.error;
   static const warning = AppPalette.warning;
@@ -85,18 +89,43 @@ class AppColors {
   static const accentPink = AppPalette.pink;
   static const accentTeal = AppPalette.teal400;
   static const accentPurple = AppPalette.purple;
-  static const divider = AppPalette.slate700;
-  static const overlay = Color(0x0AFFFFFF);
+  static const tealDark = AppPalette.teal800;
+  static const tealDarkest = AppPalette.teal900;
+  static const divider = AppPalette.slate200;
+  static const overlay = Color(0x0A000000);
+
+  // Signature hero gradient (Primary Blue → Deep Blue-Violet)
+  static const heroGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppPalette.primary500, AppPalette.primary600],
+  );
 
   static List<BoxShadow> shadowSm = [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 2)),
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.06),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+    ),
   ];
   static List<BoxShadow> shadowMd = [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.16), blurRadius: 16, offset: const Offset(0, 6)),
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.08),
+      blurRadius: 16,
+      offset: const Offset(0, 6),
+    ),
   ];
   static List<BoxShadow> shadowLg = [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.20), blurRadius: 24, offset: const Offset(0, 10)),
-    BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, 2)),
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.10),
+      blurRadius: 24,
+      offset: const Offset(0, 10),
+    ),
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.05),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+    ),
   ];
 }
 
@@ -291,7 +320,8 @@ class AppThemeData extends ThemeExtension<AppThemeData> {
       onSurface: onSurface ?? this.onSurface,
       surfaceContainer: surfaceContainer ?? this.surfaceContainer,
       surfaceContainerHigh: surfaceContainerHigh ?? this.surfaceContainerHigh,
-      surfaceContainerHighest: surfaceContainerHighest ?? this.surfaceContainerHighest,
+      surfaceContainerHighest:
+          surfaceContainerHighest ?? this.surfaceContainerHighest,
       onSurfaceVariant: onSurfaceVariant ?? this.onSurfaceVariant,
       background: background ?? this.background,
       onBackground: onBackground ?? this.onBackground,
@@ -311,23 +341,58 @@ class AppThemeData extends ThemeExtension<AppThemeData> {
   }
 
   @override
-  ThemeExtension<AppThemeData> lerp(covariant ThemeExtension<AppThemeData>? other, double t) {
+  ThemeExtension<AppThemeData> lerp(
+    covariant ThemeExtension<AppThemeData>? other,
+    double t,
+  ) {
     if (other is! AppThemeData) return this;
     return AppThemeData(
       primary: Color.lerp(primary, other.primary, t)!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
-      primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t)!,
-      onPrimaryContainer: Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
+      primaryContainer: Color.lerp(
+        primaryContainer,
+        other.primaryContainer,
+        t,
+      )!,
+      onPrimaryContainer: Color.lerp(
+        onPrimaryContainer,
+        other.onPrimaryContainer,
+        t,
+      )!,
       secondary: Color.lerp(secondary, other.secondary, t)!,
       onSecondary: Color.lerp(onSecondary, other.onSecondary, t)!,
-      secondaryContainer: Color.lerp(secondaryContainer, other.secondaryContainer, t)!,
-      onSecondaryContainer: Color.lerp(onSecondaryContainer, other.onSecondaryContainer, t)!,
+      secondaryContainer: Color.lerp(
+        secondaryContainer,
+        other.secondaryContainer,
+        t,
+      )!,
+      onSecondaryContainer: Color.lerp(
+        onSecondaryContainer,
+        other.onSecondaryContainer,
+        t,
+      )!,
       surface: Color.lerp(surface, other.surface, t)!,
       onSurface: Color.lerp(onSurface, other.onSurface, t)!,
-      surfaceContainer: Color.lerp(surfaceContainer, other.surfaceContainer, t)!,
-      surfaceContainerHigh: Color.lerp(surfaceContainerHigh, other.surfaceContainerHigh, t)!,
-      surfaceContainerHighest: Color.lerp(surfaceContainerHighest, other.surfaceContainerHighest, t)!,
-      onSurfaceVariant: Color.lerp(onSurfaceVariant, other.onSurfaceVariant, t)!,
+      surfaceContainer: Color.lerp(
+        surfaceContainer,
+        other.surfaceContainer,
+        t,
+      )!,
+      surfaceContainerHigh: Color.lerp(
+        surfaceContainerHigh,
+        other.surfaceContainerHigh,
+        t,
+      )!,
+      surfaceContainerHighest: Color.lerp(
+        surfaceContainerHighest,
+        other.surfaceContainerHighest,
+        t,
+      )!,
+      onSurfaceVariant: Color.lerp(
+        onSurfaceVariant,
+        other.onSurfaceVariant,
+        t,
+      )!,
       background: Color.lerp(background, other.background, t)!,
       onBackground: Color.lerp(onBackground, other.onBackground, t)!,
       outline: Color.lerp(outline, other.outline, t)!,
@@ -336,9 +401,17 @@ class AppThemeData extends ThemeExtension<AppThemeData> {
       onError: Color.lerp(onError, other.onError, t)!,
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
       success: Color.lerp(success, other.success, t)!,
-      successContainer: Color.lerp(successContainer, other.successContainer, t)!,
+      successContainer: Color.lerp(
+        successContainer,
+        other.successContainer,
+        t,
+      )!,
       warning: Color.lerp(warning, other.warning, t)!,
-      warningContainer: Color.lerp(warningContainer, other.warningContainer, t)!,
+      warningContainer: Color.lerp(
+        warningContainer,
+        other.warningContainer,
+        t,
+      )!,
       info: Color.lerp(info, other.info, t)!,
       infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
       shadow: Color.lerp(shadow, other.shadow, t)!,
@@ -349,7 +422,11 @@ class AppThemeData extends ThemeExtension<AppThemeData> {
 // ─── Context Extension ──────────────────────────────────────────────────────
 
 extension AppThemeContext on BuildContext {
-  AppThemeData get appTheme => Theme.of(this).extension<AppThemeData>()!;
+  AppThemeData get appTheme =>
+      Theme.of(this).extension<AppThemeData>() ??
+      (Theme.of(this).brightness == Brightness.dark
+          ? AppThemeData.dark
+          : AppThemeData.light);
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
   Color get surface => appTheme.surface;
   Color get surfaceContainer => appTheme.surfaceContainer;
@@ -445,8 +522,13 @@ ThemeData buildAppTheme(Brightness brightness) {
       backgroundColor: appTheme.surfaceContainerHighest,
       contentTextStyle: TextStyle(color: appTheme.onSurface),
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.md)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md, vertical: SpacingTokens.md),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(RadiusTokens.md),
+      ),
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.md,
+        vertical: SpacingTokens.md,
+      ),
     ),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: appTheme.surface,
@@ -454,15 +536,28 @@ ThemeData buildAppTheme(Brightness brightness) {
       showDragHandle: true,
       dragHandleColor: appTheme.onSurfaceVariant,
       shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(RadiusTokens.xl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(RadiusTokens.xl),
+        ),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: appTheme.surfaceContainer,
-      hintStyle: TextStyle(color: appTheme.onSurfaceVariant.withValues(alpha: 0.6), fontSize: 14),
-      labelStyle: TextStyle(color: appTheme.onSurfaceVariant, fontSize: 14, fontWeight: FontWeight.w500),
-      floatingLabelStyle: TextStyle(color: appTheme.primary, fontSize: 12, fontWeight: FontWeight.w600),
+      hintStyle: TextStyle(
+        color: appTheme.onSurfaceVariant.withValues(alpha: 0.6),
+        fontSize: 14,
+      ),
+      labelStyle: TextStyle(
+        color: appTheme.onSurfaceVariant,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      floatingLabelStyle: TextStyle(
+        color: appTheme.primary,
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(RadiusTokens.md),
         borderSide: BorderSide(color: appTheme.outline, width: 1),
@@ -483,7 +578,10 @@ ThemeData buildAppTheme(Brightness brightness) {
         borderRadius: BorderRadius.circular(RadiusTokens.md),
         borderSide: BorderSide(color: appTheme.error, width: 1.5),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md, vertical: SpacingTokens.md),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.md,
+        vertical: SpacingTokens.md,
+      ),
       prefixIconColor: appTheme.onSurfaceVariant,
       suffixIconColor: appTheme.onSurfaceVariant,
     ),
@@ -505,9 +603,18 @@ ThemeData buildAppTheme(Brightness brightness) {
         foregroundColor: appTheme.onPrimary,
         disabledBackgroundColor: appTheme.surfaceContainerHighest,
         disabledForegroundColor: appTheme.onSurfaceVariant,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.md)),
-        padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg, vertical: SpacingTokens.md),
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RadiusTokens.md),
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: SpacingTokens.lg,
+          vertical: SpacingTokens.md,
+        ),
+        textStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+        ),
         elevation: 0,
       ),
     ),
@@ -515,8 +622,13 @@ ThemeData buildAppTheme(Brightness brightness) {
       style: TextButton.styleFrom(
         foregroundColor: appTheme.primary,
         disabledForegroundColor: appTheme.onSurfaceVariant,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.sm)),
-        padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md, vertical: SpacingTokens.sm),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RadiusTokens.sm),
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: SpacingTokens.md,
+          vertical: SpacingTokens.sm,
+        ),
         textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),
     ),
@@ -525,9 +637,18 @@ ThemeData buildAppTheme(Brightness brightness) {
         foregroundColor: appTheme.onSurface,
         disabledForegroundColor: appTheme.onSurfaceVariant,
         side: BorderSide(color: appTheme.outline, width: 1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.md)),
-        padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg, vertical: SpacingTokens.md),
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RadiusTokens.md),
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: SpacingTokens.lg,
+          vertical: SpacingTokens.md,
+        ),
+        textStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+        ),
       ),
     ),
     dataTableTheme: DataTableThemeData(
@@ -537,8 +658,17 @@ ThemeData buildAppTheme(Brightness brightness) {
       dataRowMaxHeight: 64,
       headingRowHeight: 48,
       dividerThickness: 0.5,
-      headingTextStyle: TextStyle(color: appTheme.onSurfaceVariant, fontWeight: FontWeight.w600, fontSize: 12, letterSpacing: 0.5),
-      dataTextStyle: TextStyle(color: appTheme.onSurface, fontSize: 13, fontWeight: FontWeight.w500),
+      headingTextStyle: TextStyle(
+        color: appTheme.onSurfaceVariant,
+        fontWeight: FontWeight.w600,
+        fontSize: 12,
+        letterSpacing: 0.5,
+      ),
+      dataTextStyle: TextStyle(
+        color: appTheme.onSurface,
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
@@ -546,34 +676,69 @@ ThemeData buildAppTheme(Brightness brightness) {
         return appTheme.onSurfaceVariant;
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) return appTheme.primary.withValues(alpha: 0.3);
+        if (states.contains(WidgetState.selected)) {
+          return appTheme.primary.withValues(alpha: 0.3);
+        }
         return appTheme.surfaceContainerHighest;
       }),
-      trackOutlineColor: WidgetStateProperty.resolveWith((_) => appTheme.outline),
+      trackOutlineColor: WidgetStateProperty.resolveWith(
+        (_) => appTheme.outline,
+      ),
     ),
     chipTheme: ChipThemeData(
       backgroundColor: appTheme.surfaceContainer,
       selectedColor: appTheme.primaryContainer,
-      padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm, vertical: SpacingTokens.xxs),
-      labelStyle: TextStyle(color: appTheme.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.sm,
+        vertical: SpacingTokens.xxs,
+      ),
+      labelStyle: TextStyle(
+        color: appTheme.onSurface,
+        fontWeight: FontWeight.w600,
+        fontSize: 13,
+      ),
       brightness: brightness,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.full), side: BorderSide(color: appTheme.outline)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(RadiusTokens.full),
+        side: BorderSide(color: appTheme.outline),
+      ),
     ),
     popupMenuTheme: PopupMenuThemeData(
       color: appTheme.surfaceContainerHigh,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.md), side: BorderSide(color: appTheme.outlineVariant)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(RadiusTokens.md),
+        side: BorderSide(color: appTheme.outlineVariant),
+      ),
       elevation: 8,
-      shadowColor: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
-      textStyle: TextStyle(color: appTheme.onSurface, fontSize: 13, fontWeight: FontWeight.w500),
+      shadowColor: isDark
+          ? Colors.black.withValues(alpha: 0.3)
+          : Colors.black.withValues(alpha: 0.15),
+      textStyle: TextStyle(
+        color: appTheme.onSurface,
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
     ),
     dialogTheme: DialogThemeData(
       backgroundColor: appTheme.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusTokens.xl), side: BorderSide(color: appTheme.outlineVariant)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(RadiusTokens.xl),
+        side: BorderSide(color: appTheme.outlineVariant),
+      ),
       elevation: 16,
-      titleTextStyle: TextStyle(color: appTheme.onSurface, fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
-      contentTextStyle: TextStyle(color: appTheme.onSurfaceVariant, fontSize: 14, height: 1.5),
+      titleTextStyle: TextStyle(
+        color: appTheme.onSurface,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.2,
+      ),
+      contentTextStyle: TextStyle(
+        color: appTheme.onSurfaceVariant,
+        fontSize: 14,
+        height: 1.5,
+      ),
     ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
@@ -581,8 +746,15 @@ ThemeData buildAppTheme(Brightness brightness) {
         borderRadius: BorderRadius.circular(RadiusTokens.xs),
         border: Border.all(color: appTheme.outlineVariant),
       ),
-      textStyle: TextStyle(color: appTheme.onSurface, fontSize: 12, fontWeight: FontWeight.w500),
-      padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm, vertical: SpacingTokens.xxs),
+      textStyle: TextStyle(
+        color: appTheme.onSurface,
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.sm,
+        vertical: SpacingTokens.xxs,
+      ),
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: appTheme.primary,
@@ -596,7 +768,9 @@ ThemeData buildAppTheme(Brightness brightness) {
       surfaceTintColor: Colors.transparent,
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         return TextStyle(
-          color: states.contains(WidgetState.selected) ? appTheme.primary : appTheme.onSurfaceVariant,
+          color: states.contains(WidgetState.selected)
+              ? appTheme.primary
+              : appTheme.onSurfaceVariant,
           fontSize: 11,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.3,
@@ -604,7 +778,9 @@ ThemeData buildAppTheme(Brightness brightness) {
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         return IconThemeData(
-          color: states.contains(WidgetState.selected) ? appTheme.primary : appTheme.onSurfaceVariant,
+          color: states.contains(WidgetState.selected)
+              ? appTheme.primary
+              : appTheme.onSurfaceVariant,
           size: 22,
         );
       }),
