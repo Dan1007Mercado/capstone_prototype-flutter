@@ -1167,7 +1167,7 @@ class _MoreSurveyAction extends StatelessWidget {
         onMockAction(value, survey);
       },
       itemBuilder: (context) => const [
-        PopupMenuItem(value: 'download_omr', child: Text('Download OMR')),
+        PopupMenuItem(value: 'download_omr', child: Text('Download OMR Sheet')),
         PopupMenuItem(value: 'archive', child: Text('Archive')),
         PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
