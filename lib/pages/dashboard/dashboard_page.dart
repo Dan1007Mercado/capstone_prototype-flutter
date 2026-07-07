@@ -1,10 +1,11 @@
-import 'dart:async';
+// hero removed — no async imports needed
 
 import 'package:flutter/material.dart';
 
 import '../../mock/mock_data.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
+import 'top_survey_performance.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({
@@ -26,7 +27,7 @@ class DashboardPage extends StatelessWidget {
   static const Color _mutedText = Color.fromARGB(255, 125, 135, 144);
   static const Color _border = Color.fromARGB(255, 230, 237, 240);
   static const Color _panelTint = Color.fromARGB(255, 246, 250, 251);
-  static const double _heroOverlap = 28;
+  static const double _heroOverlap = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,7 @@ class DashboardPage extends StatelessWidget {
                         0,
                       ),
                       child: PageHeader(
-                        title: 'Dashboard',
+                        title: 'Home',
                         onNotifications: onNotifications,
                         onSettings: onSettings,
                         unreadNotifications: unreadNotifications,
@@ -61,32 +62,26 @@ class DashboardPage extends StatelessWidget {
                 ),
               ),
               SliverToBoxAdapter(
-                child: _DashboardHero(
-                  horizontalPadding: horizontalPadding,
-                  maxContentWidth: maxContentWidth,
-                ),
-              ),
-              SliverToBoxAdapter(
                 child: Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: maxContentWidth),
-                    // shift the content up so it visually overlaps the hero
-                    child: Transform.translate(
-                      offset: const Offset(0, -DashboardPage._heroOverlap),
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          horizontalPadding,
-                          16,
-                          horizontalPadding,
-                          0,
-                        ),
-                        child: Column(
-                          children: [
-                            _StatsGrid(onOpenAnalytics: onOpenAnalytics),
-                            const SizedBox(height: 12),
-                            const _ActivityPanel(),
-                          ],
-                        ),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        16,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: Column(
+                        children: [
+                          _StatsGrid(onOpenAnalytics: onOpenAnalytics),
+                          const SizedBox(height: 8),
+                          TopSurveyPerformance(
+                            onViewAnalytics: () => onOpenAnalytics(),
+                          ),
+                          const SizedBox(height: 8),
+                          const _ActivityPanel(),
+                        ],
                       ),
                     ),
                   ),
@@ -101,226 +96,8 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-// The hero and the stats-grid overlap are now built together inside a
-// single Stack, so the overlap amount is always relative to the hero's
-// real rendered height — it can never "leave a hole" behind if the hero
-// changes size or disappears, unlike the old Transform.translate(-64)
-// approach which assumed the hero was permanently a fixed height.
-class _DashboardHero extends StatefulWidget {
-  const _DashboardHero({
-    required this.horizontalPadding,
-    required this.maxContentWidth,
-  });
 
-  final double horizontalPadding;
-  final double maxContentWidth;
 
-  @override
-  State<_DashboardHero> createState() => _DashboardHeroState();
-}
-
-class _DashboardHeroState extends State<_DashboardHero> {
-  // use DashboardPage._heroOverlap so overlap is consistent across widgets
-  bool _visible = true;
-  Timer? _hideTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _hideTimer = Timer(const Duration(seconds: 5), () {
-      if (mounted) {
-        setState(() {
-          _visible = false;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _hideTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedCrossFade(
-      firstChild: _buildHero(context),
-      secondChild: const SizedBox.shrink(),
-      crossFadeState:
-          _visible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-      duration: const Duration(milliseconds: 450),
-      firstCurve: Curves.easeOut,
-      secondCurve: Curves.easeIn,
-      sizeCurve: Curves.easeInOut,
-    );
-  }
-
-  Widget _buildHero(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.fromLTRB(
-            widget.horizontalPadding,
-            36,
-            widget.horizontalPadding,
-            64,
-          ),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [DashboardPage._heroStart, DashboardPage._heroEnd],
-            ),
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: widget.maxContentWidth),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned(
-                    right: -72,
-                    top: -84,
-                    child: _HeroGlow(size: 224, opacity: 0.15),
-                  ),
-                  Positioned(
-                    left: -68,
-                    bottom: -104,
-                    child: _HeroGlow(size: 256, opacity: 0.10),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 18),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 680),
-                        child: Text(
-                          'Command center for surveys, conversion & analytics.',
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                height: 1.12,
-                                letterSpacing: 0,
-                              ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 610),
-                        child: Text(
-                          'Monitor response flow, template usage, AI conversion, and scanner activity from one workspace.',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.86),
-                                    height: 1.5,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                        ),
-                      ),
-                      const SizedBox(height: 22),
-                      const _HealthCard(),
-                      // Reserve the overlap space inside the hero's own
-                      // layout so the sliver below can visually overlap.
-                      SizedBox(height: DashboardPage._heroOverlap),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HeroGlow extends StatelessWidget {
-  const _HeroGlow({required this.size, required this.opacity});
-
-  final double size;
-  final double opacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: opacity),
-      ),
-    );
-  }
-}
-
-class _HealthCard extends StatelessWidget {
-  const _HealthCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 520),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(
-                Icons.bar_chart_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '87%',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  Text(
-                    'survey completion health',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.86),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_outward_rounded,
-              color: Colors.white.withValues(alpha: 0.92),
-              size: 24,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _StatsGrid extends StatelessWidget {
   const _StatsGrid({required this.onOpenAnalytics});

@@ -3,12 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_models.dart';
 import '../pages/analytics/analytics_page.dart';
+import '../pages/online_forms/online_forms_page.dart';
 import '../pages/conversion/conversion_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/settings/settings_page.dart';
 import '../pages/surveys/deploy_survey_page.dart';
 import '../pages/surveys/surveys_page.dart';
 import '../pages/scanner/omr_scanner_page.dart';
+import '../mock/mock_data.dart' as mock_data;
+import '../pages/surveys/responses_page.dart';
 import '../pages/templates/create_template_page.dart';
 import '../pages/templates/templates_page.dart';
 import '../state/app_state.dart';
@@ -46,6 +49,15 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
+  void _openResponses(SurveyRecord survey) {
+    final responses = mock_data.buildMockResponses(survey);
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ResponsesPage(survey: survey, responses: responses),
+      ),
+    );
+  }
+
   void _openCreateTemplate() {
     Navigator.of(
       context,
@@ -54,7 +66,7 @@ class _AppShellState extends State<AppShell> {
 
   void _openSurveyConverter() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const SurveyConverterPage()),
+      MaterialPageRoute<void>(builder: (_) => const OnlineFormsPage()),
     );
   }
 
@@ -265,6 +277,7 @@ class _AppShellState extends State<AppShell> {
                 ),
                 SurveysPage(
                   onOpenAnalytics: _openAnalytics,
+                  onOpenResponses: _openResponses,
                   onNotifications: _handleNotifications,
                   onSettings: _showSettings,
                   unreadNotifications: appState.unreadNotifications,
@@ -274,7 +287,7 @@ class _AppShellState extends State<AppShell> {
                   onSettings: _showSettings,
                   unreadNotifications: appState.unreadNotifications,
                 ),
-                SurveyConverterPage(
+                OnlineFormsPage(
                   onNotifications: _handleNotifications,
                   onSettings: _showSettings,
                   unreadNotifications: appState.unreadNotifications,
@@ -330,8 +343,8 @@ class _AppShellState extends State<AppShell> {
                             onTap: () => setState(() => _index = 2),
                           ),
                           _NavItem(
-                            label: 'CONVERTER',
-                            icon: Icons.swap_horiz_outlined,
+                            label: 'FORMS',
+                            icon: Icons.assignment_outlined,
                             selected: _index == 3,
                             onTap: () => setState(() => _index = 3),
                           ),
@@ -591,8 +604,8 @@ class _GlobalFloatingActionMenuState extends State<GlobalFloatingActionMenu> {
         onTap: () => _run(widget.onCreateTemplate),
       ),
       _DialAction(
-        label: 'Convert Questionnaire',
-        icon: Icons.swap_horiz_outlined,
+        label: 'Forms',
+        icon: Icons.assignment_outlined,
         onTap: () => _run(widget.onConvertQuestionnaire),
       ),
     ];

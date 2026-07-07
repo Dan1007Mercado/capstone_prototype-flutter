@@ -68,10 +68,11 @@ class _SurveysPageState extends State<SurveysPage> {
     }).toList();
 
     return Container(
+      
       color: AppPalette.teal50,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final maxWidth = constraints.maxWidth >= 920 ? 960.0 : 560.0;
+          final maxWidth = constraints.maxWidth >= 720 ? 960.0 : 560.0;
           final horizontalPadding = constraints.maxWidth >= 720 ? 28.0 : 16.0;
 
           return CustomScrollView(
@@ -622,9 +623,15 @@ class _SurveysHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 26, 16, 30),
+      margin: const EdgeInsets.only(top: 10),
+      width: width * 0.9,
+      constraints: BoxConstraints(
+        maxWidth: width * 0.9,
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 30),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -634,8 +641,14 @@ class _SurveysHero extends StatelessWidget {
             _SurveysPageState._tealDark,
           ],
         ),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
-        border: Border.all(color: Colors.white.withOpacity(0.16), width: 1),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(20),
+          bottom: Radius.circular(20),
+        ),
+        border: Border.all(
+          color: const Color.fromARGB(255, 92, 5, 5).withOpacity(0.16),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -650,26 +663,18 @@ class _SurveysHero extends StatelessWidget {
           Positioned(
             right: -70,
             top: -96,
-            child: _HeroCircle(size: 190, opacity: 0.17),
+            child: _HeroCircle(size: 100, opacity: 0.17),
           ),
           Positioned(
             left: -92,
             bottom: -112,
-            child: _HeroCircle(size: 250, opacity: 0.13),
+            child: _HeroCircle(size: 150, opacity: 0.13),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               
-              const SizedBox(height: 20),
-              Text(
-                'Surveys',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0,
-                ),
-              ),
+              const SizedBox(height: 1),
               const SizedBox(height: 2),
               Text(
                 '$totalCount surveys in the system',
@@ -836,6 +841,7 @@ class _SurveysPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: _SurveysPageState._cardWhite,

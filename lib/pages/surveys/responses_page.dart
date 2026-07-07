@@ -7,6 +7,14 @@ import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/paginated_table_card.dart';
 
+const Color _responsesTealDark = Color.fromARGB(255, 13, 232, 232);
+const Color _responsesTealLight = Color(0xFF2DD4CF);
+const Color _responsesHeadingText = Color(0xFF0E2A2E);
+const Color _responsesBodyText = Color(0xFF7C8A90);
+const Color _responsesCardWhite = Color(0xFFFFFFFF);
+const Color _responsesBorder = Color(0xFFDDECEF);
+const Color _responsesMintChipBg = Color(0xFFDFF5F3);
+
 class ResponsesPage extends StatefulWidget {
   const ResponsesPage({
     super.key,
@@ -46,58 +54,210 @@ class _ResponsesPageState extends State<ResponsesPage> {
     final filtered = _filteredResponses;
 
     return Scaffold(
+      backgroundColor: AppPalette.teal50,
       appBar: AppBar(
-        title: Text('Responses · ${widget.survey.name}'),
+        backgroundColor: AppPalette.teal50,
+        foregroundColor: _responsesHeadingText,
+        elevation: 0,
+        titleSpacing: 0,
+        title: Text(
+          'Responses · ${widget.survey.name}',
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final isMobile = width < 700;
           final isTablet = width >= 700 && width < 1100;
+          final maxWidth = width >= 960 ? 960.0 : width.clamp(320.0, 900.0);
 
-          return ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              SurfaceCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SectionHeader(
-                      title: 'Survey Responses',
-                      subtitle: 'Search by Response ID using frontend-only mock filtering.',
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _searchController,
-                      onChanged: (value) => setState(() => _query = value),
-                      decoration: const InputDecoration(
-                        labelText: 'Search by Response ID',
-                        prefixIcon: Icon(Icons.search),
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [_responsesTealLight, _responsesTealDark],
                       ),
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 18,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: const Icon(Icons.assignment_turned_in_outlined, color: Colors.white, size: 18),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Survey responses',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    widget.survey.name,
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.9),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _searchController,
+                          onChanged: (value) => setState(() => _query = value),
+                          cursorColor: Colors.white,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Search by response ID',
+                            hintStyle: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.78),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.82), size: 18),
+                            filled: true,
+                            fillColor: Colors.white.withValues(alpha: 0.18),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.34)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  _PanelCard(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${filtered.length} responses shown',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: _responsesHeadingText,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                'Frontend-only sample responses for this survey.',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: _responsesBodyText,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        _StatusPill(
+                          label: widget.survey.status.name.toUpperCase(),
+                          color: widget.survey.status == SurveyStatus.active ? AppPalette.success : AppPalette.primary500,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  _PanelCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(6, 4, 6, 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Response overview',
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: _responsesHeadingText,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '${filtered.length} / ${widget.responses.length}',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppPalette.primary600,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isMobile)
+                          _ResponsesMobileList(
+                            survey: widget.survey,
+                            responses: filtered,
+                            onView: _openDetails,
+                          )
+                        else if (isTablet)
+                          _ResponsesTabletTable(
+                            survey: widget.survey,
+                            responses: filtered,
+                            onView: _openDetails,
+                          )
+                        else
+                          _ResponsesDesktopTable(
+                            survey: widget.survey,
+                            responses: filtered,
+                            onView: _openDetails,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              if (isMobile)
-                _ResponsesMobileList(
-                  survey: widget.survey,
-                  responses: filtered,
-                  onView: _openDetails,
-                )
-              else if (isTablet)
-                _ResponsesTabletTable(
-                  survey: widget.survey,
-                  responses: filtered,
-                  onView: _openDetails,
-                )
-              else
-                _ResponsesDesktopTable(
-                  survey: widget.survey,
-                  responses: filtered,
-                  onView: _openDetails,
-                ),
-            ],
+            ),
           );
         },
       ),
@@ -108,6 +268,61 @@ class _ResponsesPageState extends State<ResponsesPage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ResponseDetailsPage(response: response),
+      ),
+    );
+  }
+}
+
+class _PanelCard extends StatelessWidget {
+  const _PanelCard({required this.child, this.padding = const EdgeInsets.all(16)});
+
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: _responsesCardWhite,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _responsesBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
@@ -223,10 +438,19 @@ class _ResponsesMobileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (responses.isEmpty) {
-      return const SurfaceCard(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text('No responses found.'),
+      return _PanelCard(
+        padding: const EdgeInsets.all(24),
+        child: Row(
+          children: const [
+            Icon(Icons.inbox_outlined, color: Color.fromARGB(255, 0, 0, 0)),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'No responses found.',
+                style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -300,7 +524,7 @@ class _ResponseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SurfaceCard(
+    return _PanelCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,17 +537,17 @@ class _ResponseCard extends StatelessWidget {
                   children: [
                     Text(
                       response.responseId,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                      style: const TextStyle(fontWeight: FontWeight.w800, color: _responsesHeadingText),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       response.respondentName,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     ),
                   ],
                 ),
               ),
-              StatusBadge(
+              _StatusPill(
                 label: responseStatusLabel(response.status),
                 color: responseStatusColor(response.status),
               ),
@@ -338,10 +562,15 @@ class _ResponseCard extends StatelessWidget {
           const SizedBox(height: 14),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton.icon(
+            child: FilledButton.icon(
               onPressed: onView,
               icon: const Icon(Icons.visibility_outlined, size: 16),
               label: const Text('View'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppPalette.primary600,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+              ),
             ),
           ),
         ],
@@ -391,74 +620,150 @@ class ResponseDetailsPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(response.responseId)),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SectionHeader(
-                  title: 'Respondent Information',
-                  subtitle: 'Mock completed questionnaire preview.',
+      backgroundColor: AppPalette.teal50,
+      appBar: AppBar(
+        backgroundColor: AppPalette.teal50,
+        foregroundColor: _responsesHeadingText,
+        elevation: 0,
+        title: Text(response.responseId, style: const TextStyle(fontWeight: FontWeight.w800)),
+      ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 960),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [_responsesTealLight, _responsesTealDark],
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
                 ),
-                const SizedBox(height: 16),
-                _InfoGrid(response: response),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          SectionHeader(
-            title: 'Questionnaire Content',
-            subtitle: 'Twenty unique quantitative answers on a 1-5 Likert scale.',
-          ),
-          const SizedBox(height: 16),
-          for (final answer in response.answers) ...[
-            _QuestionAnswerCard(answer: answer),
-            const SizedBox(height: 12),
-          ],
-          const SizedBox(height: 8),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth > 900;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  for (final stat in stats)
-                    SizedBox(
-                      width: wide ? (constraints.maxWidth - 32) / 2 : constraints.maxWidth,
-                      child: StatCard(
-                        label: stat.label,
-                        value: stat.value,
-                        icon: stat.icon,
-                        accent: stat.accent,
-                        delta: stat.delta,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Icon(Icons.person_outline, color: Colors.white, size: 19),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            response.respondentName,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            response.surveyName,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionHeader(
-                  title: 'Interpretation',
-                  subtitle: 'Mock respondent summary based on the generated answers.',
+                  ],
                 ),
+              ),
+              const SizedBox(height: 16),
+              _PanelCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Respondent information',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: _responsesHeadingText,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Mock completed questionnaire preview.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _responsesBodyText,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _InfoGrid(response: response),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Questionnaire content',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: _responsesHeadingText,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              for (final answer in response.answers) ...[
+                _QuestionAnswerCard(answer: answer),
                 const SizedBox(height: 12),
-                Text(
-                  response.interpretation,
-                  style: const TextStyle(height: 1.6),
-                ),
               ],
-            ),
+              const SizedBox(height: 8),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 900;
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      for (final stat in stats)
+                        SizedBox(
+                          width: wide ? (constraints.maxWidth - 32) / 2 : constraints.maxWidth,
+                          child: StatCard(
+                            label: stat.label,
+                            value: stat.value,
+                            icon: stat.icon,
+                            accent: stat.accent,
+                            delta: stat.delta,
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              _PanelCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Interpretation',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: _responsesHeadingText,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      response.interpretation,
+                      style: const TextStyle(height: 1.6, color: _responsesBodyText),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

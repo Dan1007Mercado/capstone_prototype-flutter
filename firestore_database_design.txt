@@ -1,0 +1,150 @@
+Firestore Database Design (Reverse-Engineered from lib/)
+
+Note: The current codebase does not contain an active Firestore integration. The schema below is inferred from the Dart domain models in lib/models/app_models.dart and the app state logic in lib/state/app_state.dart.
+
+Collections
+-----------
+
+surveys
+  - id: string
+  - name: string
+  - templateUsed: string
+  - category: string
+  - status: string (enum: active | closed | inactive)
+  - createdDate: string (formatted date label)
+  - responses: integer
+
+templates
+  - id: string
+  - name: string
+  - category: string
+  - usage: string
+  - lastUpdated: string
+  - components: array of objects
+      - type: string
+      - label: string
+      - description: string
+      - category: string
+      - questionNumber: integer | null
+      - alignment: string | null
+      - isRequired: boolean
+      - choices: array of strings
+      - scaleValues: array of strings
+      - placeholder: string | null
+
+responses
+  - responseId: string
+  - surveyId: string
+  - surveyName: string
+  - respondentName: string
+  - age: integer
+  - gender: string
+  - civilStatus: string
+  - occupation: string
+  - educationalLevel: string
+  - location: string
+  - dateSubmitted: string
+  - syncDate: string
+  - status: string (enum: synced | pending | exported)
+  - completionRate: double
+  - answers: array of objects
+      - questionNumber: integer
+      - questionText: string
+      - answerLabel: string
+      - score: integer
+      - interpretation: string
+  - interpretation: string
+  - surveyCategory: string
+
+conversions
+  - fileName: string
+  - source: string
+  - status: string
+  - updatedAt: string
+
+users (optional)
+  - id: string
+  - fullName: string
+  - email: string
+  - username: string
+  - phone: string
+  - conversionThreshold: integer
+  - autoReviewConfidence: integer
+  - retentionDays: integer
+  - preferences: object
+      - darkMode: boolean
+      - notificationsEnabled: boolean
+      - other UI/settings flags
+
+notifications
+  - title: string
+  - subtitle: string
+  - time: string
+  - icon: string (UI icon key)
+  - read: boolean
+
+uploadedConversionFiles (optional)
+  - id: string
+  - name: string
+  - type: string
+  - path: string | null
+  - storageRef: string | null
+  - metadata: object
+
+extracted_components
+  - id: string
+  - type: string
+  - label: string
+  - description: string
+  - questionNumber: integer | null
+  - alignment: string | null
+
+Document Relationships
+----------------------
+
+surveys.templateUsed -> templates.name
+responses.surveyId -> surveys.id
+responses.surveyName -> surveys.name
+templates.components[] -> definition of each template field/question
+extracted_components -> intermediate detection artifacts used by questionnaire conversion
+
+Possible Firestore layout options
+---------------------------------
+
+1) Flat collections
+   - /surveys/{surveyId}
+   - /templates/{templateId}
+   - /responses/{responseId}
+   - /conversions/{conversionId}
+   - /notifications/{notificationId}
+   - /extracted_components/{componentId}
+
+2) User-scoped collections
+   - /users/{userId}/surveys/{surveyId}
+   - /users/{userId}/templates/{templateId}
+   - /users/{userId}/responses/{responseId}
+   - /users/{userId}/notifications/{notificationId}
+   - /users/{userId}/conversions/{conversionId}
+   - /users/{userId}/extracted_components/{componentId}
+
+Implementation hints
+--------------------
+
+- `TemplateRecord.components` is a nested array and can be stored directly inside the template document.
+- `ResponseRecord.answers` is also a nested array with structured answer objects.
+- `SurveyStatus` and `ResponseStatus` should be stored as strings or small integers to preserve enum behavior.
+- `createdDate`, `lastUpdated`, and `dateSubmitted` are currently strings in the app; a Firestore schema should normalize them to `Timestamp` for querying and sorting.
+- `uploadedConversionFiles` are currently held in memory; if persisted, use a separate collection or subcollection and store file storage references.
+- `notifications` are UI items and can be kept in-memory or persisted per user for history and read/unread state.
+
+Derived Fields and UI metadata
+------------------------------
+
+- `templates.usage` is a display field; in Firestore it could be derived from count of linked surveys or stored as summary metadata.
+- `surveys.responses` is summary metadata and may be derived from count of corresponding `responses` documents.
+- `templateUsed` in surveys is a denormalized string; for stronger integrity use `templateId` instead.
+
+Summary
+-------
+
+The app's domain model revolves around templates, surveys, and responses. A Firestore schema should center on `templates`, `surveys`, and `responses` as primary collections, with optional user-scoped subcollections for notifications, conversions, and extracted survey components.

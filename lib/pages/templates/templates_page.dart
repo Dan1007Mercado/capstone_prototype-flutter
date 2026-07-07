@@ -84,28 +84,7 @@ class TemplatesPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    const _HeaderPill(
-                                      icon: Icons.arrow_back,
-                                      label: 'Back',
-                                    ),
-                                    const Spacer(),
-                                    const _HeaderPill(
-                                      icon: Icons.view_agenda_rounded,
-                                      label: 'Templates',
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Templates',
-                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0,
-                                  ),
-                                ),
+                                
                                 const SizedBox(height: 6),
                                 Text(
                                   '${templateRows.length} reusable templates',
@@ -175,7 +154,7 @@ class TemplatesPage extends StatelessWidget {
                                           ),
                                         ),
                                         icon: const Icon(Icons.add, size: 17),
-                                        label: const Text('+ New'),
+                                        label: const Text('New'),
                                         style: FilledButton.styleFrom(
                                           backgroundColor: Colors.white,
                                           foregroundColor: AppPalette.teal800,
@@ -205,7 +184,7 @@ class TemplatesPage extends StatelessWidget {
                                   value: '${templateRows.length}',
                                   icon: Icons.grid_view_rounded,
                                   accent: AppColors.primary,
-                                  delta: 'Mock library',
+                                  delta: 'Library',
                                 ),
                                 StatItem(
                                   label: 'High Usage',
@@ -232,24 +211,20 @@ class TemplatesPage extends StatelessWidget {
                               );
                             },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           SurfaceCard(
                             color: Colors.white,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SectionHeader(
-                                  title: 'Templates',
-                                  subtitle: 'Reusable mock templates with pagination and compact metadata.',
-                                ),
-                                const SizedBox(height: 12),
+                                
                                 Column(
                                   children: List.generate(templateRows.length, (index) {
                                     final template = templateRows[index];
                                     return Column(
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 14),
+                                          padding: const EdgeInsets.symmetric(vertical: 10),
                                           child: LayoutBuilder(
                                             builder: (context, rowConstraints) {
                                               final isNarrow = rowConstraints.maxWidth < 380;
@@ -265,6 +240,7 @@ class TemplatesPage extends StatelessWidget {
                                                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                                                       color: AppPalette.teal800,
                                                       fontWeight: FontWeight.w800,
+                                                      fontSize: 21,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 8),
@@ -287,6 +263,7 @@ class TemplatesPage extends StatelessWidget {
                                                     template.lastUpdated,
                                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                       color: AppColors.textSecondary,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
                                                 ],
@@ -381,9 +358,9 @@ class TemplatesPage extends StatelessWidget {
                                                 return Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    titleBlock,
+                                                    SizedBox(width: double.infinity, child: titleBlock),
                                                     const SizedBox(height: 12),
-                                                    actionsRow,
+                                                    Align(alignment: Alignment.centerRight, child: actionsRow),
                                                   ],
                                                 );
                                               }
@@ -392,7 +369,6 @@ class TemplatesPage extends StatelessWidget {
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
                                                   Expanded(child: titleBlock),
-                                                  const SizedBox(width: 12),
                                                   actionsRow,
                                                 ],
                                               );

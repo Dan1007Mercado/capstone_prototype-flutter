@@ -118,6 +118,8 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
                                     icon: const Icon(Icons.photo_library_outlined, size: 18),
                                     label: const Text('Upload Images'),
                                     style: FilledButton.styleFrom(
+                                      minimumSize: const Size(160, 44),
+                                      padding: const EdgeInsets.symmetric(horizontal: 18),
                                       backgroundColor: Colors.white,
                                       foregroundColor: AppPalette.teal700,
                                       shape: RoundedRectangleBorder(
@@ -134,6 +136,8 @@ class _SurveyConverterPageState extends State<SurveyConverterPage> {
                                     icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
                                     label: const Text('Upload PDF'),
                                     style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(160, 44),
+                                      padding: const EdgeInsets.symmetric(horizontal: 18),
                                       backgroundColor: Colors.white.withValues(alpha: 0.14),
                                       foregroundColor: Colors.white,
                                       side: BorderSide(color: Colors.white.withValues(alpha: 0.28)),

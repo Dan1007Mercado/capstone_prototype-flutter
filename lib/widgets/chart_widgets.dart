@@ -304,6 +304,7 @@ class _MiniChartBodyState extends State<_MiniChartBody> {
     }
   }
 }
+ 
 
 class _InterpretationBody extends StatelessWidget {
   const _InterpretationBody({super.key, required this.text});
@@ -604,6 +605,47 @@ class _HorizontalBarChart extends StatelessWidget {
               ),
             )
             .toList(),
+      ),
+    );
+  }
+}
+
+class TopSurveyBarChart extends StatelessWidget {
+  const TopSurveyBarChart({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.points,
+    required this.accent,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<ChartPoint> points;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.appTheme;
+    return SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(title: title, subtitle: subtitle),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(RadiusTokens.lg),
+              border: Border.all(color: theme.outlineVariant.withValues(alpha: 0.4)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _BarChart(points: points, accent: accent),
+            ),
+          ),
+        ],
       ),
     );
   }
