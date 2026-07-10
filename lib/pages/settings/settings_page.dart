@@ -20,6 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final _profileFormKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController(text: 'Daniel');
   final _lastNameController = TextEditingController(text: 'Mercado');
+  final _genderController = TextEditingController(text: 'Male');
   final _emailController = TextEditingController(
     text: 'dmercado@talanscan.local',
   );
@@ -38,6 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _genderController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _conversionThresholdController.dispose();
@@ -215,6 +217,15 @@ class _SettingsPageState extends State<SettingsPage> {
                             return null;
                           },
                         ),
+                        
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _genderController,
+                          decoration: const InputDecoration(
+                            labelText: 'Gender',
+                            prefixIcon: Icon(Icons.boy_outlined, size: 20),
+                          ),
+                        ),
                         const SizedBox(height: 14),
                         TextFormField(
                           controller: _phoneController,
@@ -352,54 +363,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 final isWide = constraints.maxWidth > 760;
                 final cardSpacing = const SizedBox(height: 16);
                 final cards = [
-                  _buildPreferenceCard(
-                    title: 'AI Conversion',
-                    subtitle:
-                        'Configure AI Engine workflow and review thresholds for document conversion.',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        TextFormField(
-                          controller: _conversionThresholdController,
-                          decoration: const InputDecoration(
-                            labelText: 'Confidence Threshold (%)',
-                            prefixIcon: Icon(Icons.tune_outlined, size: 20),
-                          ),
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _autoReviewConfidenceController,
-                          decoration: const InputDecoration(
-                            labelText: 'Auto-Review Confidence',
-                            prefixIcon: Icon(
-                              Icons.auto_awesome_outlined,
-                              size: 20,
-                            ),
-                          ),
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 14),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          activeColor: _heroEnd,
-                          title: const Text('Enable Auto-Processing'),
-                          value: _enableAutoProcessing,
-                          onChanged: (value) =>
-                              setState(() => _enableAutoProcessing = value),
-                        ),
-                        const SizedBox(height: 12),
-                        FilledButton(
-                          onPressed: _saveSettings,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: _heroEnd,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Save Settings'),
-                        ),
-                      ],
-                    ),
-                  ),
+                  
                   _buildPreferenceCard(
                     title: 'Notifications',
                     subtitle: 'Manage how and when you receive notifications.',
@@ -408,7 +372,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: [
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
-                          activeColor: _heroEnd,
+                          activeThumbColor: _heroEnd,
                           title: const Text('Email Notifications'),
                           value: _emailNotifications,
                           onChanged: (value) =>
@@ -416,19 +380,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
-                          activeColor: _heroEnd,
+                          activeThumbColor: _heroEnd,
                           title: const Text('Survey Completion Alerts'),
                           value: _surveyAlerts,
                           onChanged: (value) =>
                               setState(() => _surveyAlerts = value),
-                        ),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          activeColor: _heroEnd,
-                          title: const Text('Conversion Errors Only'),
-                          value: _conversionErrorsOnly,
-                          onChanged: (value) =>
-                              setState(() => _conversionErrorsOnly = value),
                         ),
                         const SizedBox(height: 12),
                         FilledButton(
@@ -438,52 +394,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             foregroundColor: Colors.white,
                           ),
                           child: const Text('Save Preferences'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  _buildPreferenceCard(
-                    title: 'Data & Privacy',
-                    subtitle: 'Manage data retention and privacy settings.',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        TextFormField(
-                          controller: _retentionController,
-                          decoration: const InputDecoration(
-                            labelText: 'Data Retention Period (days)',
-                            prefixIcon: Icon(
-                              Icons.calendar_today_outlined,
-                              size: 20,
-                            ),
-                          ),
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 12),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          activeColor: _heroEnd,
-                          title: const Text('Anonymize User Data'),
-                          value: _anonymizeUserData,
-                          onChanged: (value) =>
-                              setState(() => _anonymizeUserData = value),
-                        ),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          activeColor: _heroEnd,
-                          title: const Text('Encrypted Backups'),
-                          value: _encryptedBackups,
-                          onChanged: (value) =>
-                              setState(() => _encryptedBackups = value),
-                        ),
-                        const SizedBox(height: 12),
-                        FilledButton(
-                          onPressed: _saveSettings,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: _heroEnd,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Save Settings'),
                         ),
                       ],
                     ),
@@ -521,38 +431,32 @@ class _SettingsPageState extends State<SettingsPage> {
                 ];
 
                 if (isWide) {
-                  return Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(child: cards[0]),
+                  final rows = <Widget>[];
+                  for (var i = 0; i < cards.length; i += 2) {
+                    rows.add(Row(
+                      children: [
+                        Expanded(child: cards[i]),
+                        if (i + 1 < cards.length) ...[
                           const SizedBox(width: 16),
-                          Expanded(child: cards[1]),
+                          Expanded(child: cards[i + 1]),
                         ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(child: cards[2]),
-                          const SizedBox(width: 16),
-                          Expanded(child: cards[3]),
-                        ],
-                      ),
-                    ],
-                  );
+                      ],
+                    ));
+                    if (i + 2 < cards.length) {
+                      rows.add(const SizedBox(height: 16));
+                    }
+                  }
+                  return Column(children: rows);
                 }
 
-                return Column(
-                  children: [
-                    cards[0],
-                    cardSpacing,
-                    cards[1],
-                    cardSpacing,
-                    cards[2],
-                    cardSpacing,
-                    cards[3],
-                  ],
-                );
+                final columnChildren = <Widget>[];
+                for (var i = 0; i < cards.length; i += 1) {
+                  if (i > 0) {
+                    columnChildren.add(cardSpacing);
+                  }
+                  columnChildren.add(cards[i]);
+                }
+                return Column(children: columnChildren);
               },
             ),
             const SizedBox(height: 30),

@@ -1,150 +1,177 @@
-Firestore Database Design (Reverse-Engineered from lib/)
+const { initializeApp } = require("firebase-admin/app");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
-Note: The current codebase does not contain an active Firestore integration. The schema below is inferred from the Dart domain models in lib/models/app_models.dart and the app state logic in lib/state/app_state.dart.
+initializeApp();
 
-Collections
------------
+const db = getFirestore();
 
-surveys
-  - id: string
-  - name: string
-  - templateUsed: string
-  - category: string
-  - status: string (enum: active | closed | inactive)
-  - createdDate: string (formatted date label)
-  - responses: integer
+async function seed() {
+  try {
+    console.log("🌱 Seeding Firestore...");
 
-templates
-  - id: string
-  - name: string
-  - category: string
-  - usage: string
-  - lastUpdated: string
-  - components: array of objects
-      - type: string
-      - label: string
-      - description: string
-      - category: string
-      - questionNumber: integer | null
-      - alignment: string | null
-      - isRequired: boolean
-      - choices: array of strings
-      - scaleValues: array of strings
-      - placeholder: string | null
+    // ==========================
+    // USERS
+    // ==========================
+    const users = [
+      {
+        id: "admin",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
+        username: "johndoe",
+        phone: "+1234567890",
+        isActive: true,
+      },
+      {
+        id: "user001",
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "jane@example.com",
+        username: "janesmith",
+        phone: "+9876543210",
+        isActive: true,
+      },
+    ];
 
-responses
-  - responseId: string
-  - surveyId: string
-  - surveyName: string
-  - respondentName: string
-  - age: integer
-  - gender: string
-  - civilStatus: string
-  - occupation: string
-  - educationalLevel: string
-  - location: string
-  - dateSubmitted: string
-  - syncDate: string
-  - status: string (enum: synced | pending | exported)
-  - completionRate: double
-  - answers: array of objects
-      - questionNumber: integer
-      - questionText: string
-      - answerLabel: string
-      - score: integer
-      - interpretation: string
-  - interpretation: string
-  - surveyCategory: string
+    for (const user of users) {
+      await db.collection("users").doc(user.id).set({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: user.username,
+        phone: user.phone,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        isActive: user.isActive,
+      });
+    }
 
-conversions
-  - fileName: string
-  - source: string
-  - status: string
-  - updatedAt: string
+    // ==========================
+    // TEMPLATE
+    // ==========================
+    const templateId = "template001";
 
-users (optional)
-  - id: string
-  - fullName: string
-  - email: string
-  - username: string
-  - phone: string
-  - conversionThreshold: integer
-  - autoReviewConfidence: integer
-  - retentionDays: integer
-  - preferences: object
-      - darkMode: boolean
-      - notificationsEnabled: boolean
-      - other UI/settings flags
+    await db.collection("templates").doc(templateId).set({
+      templateName: "Customer Satisfaction Survey",
+      description: "Measures customer satisfaction scores",
+      status: "active",
+      createdBy: "Daniel Mercado",
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
 
-notifications
-  - title: string
-  - subtitle: string
-  - time: string
-  - icon: string (UI icon key)
-  - read: boolean
+      components: [
+        {
+          componentId: "q1",
+          type: "radio",
+          label: "Overall satisfaction?",
+          placeholder: null,
+          required: true,
+          validation: {},
+          settings: {},
+          choices: [
+            "Very Satisfied",
+            "Satisfied",
+            "Neutral",
+            "Dissatisfied",
+            "Very Dissatisfied",
+          ],
+          scaleValues: [],
+        },
+        {
+          componentId: "q2",
+          type: "rating",
+          label: "Rate our service",
+          placeholder: null,
+          required: true,
+          validation: {},
+          settings: {
+            maxRating: 5,
+          },
+          choices: [],
+          scaleValues: [1, 2, 3, 4, 5],
+        },
+      ],
+    });
 
-uploadedConversionFiles (optional)
-  - id: string
-  - name: string
-  - type: string
-  - path: string | null
-  - storageRef: string | null
-  - metadata: object
+    // ==========================
+    // SURVEY
+    // ==========================
+    const surveyId = "survey001";
 
-extracted_components
-  - id: string
-  - type: string
-  - label: string
-  - description: string
-  - questionNumber: integer | null
-  - alignment: string | null
+    await db.collection("surveys").doc(surveyId).set({
+      surveyName: "Q1 2026 Customer Survey",
+      templateId: templateId,
+      templateName: "Customer Satisfaction Survey",
 
-Document Relationships
-----------------------
+      status: "active",
 
-surveys.templateUsed -> templates.name
-responses.surveyId -> surveys.id
-responses.surveyName -> surveys.name
-templates.components[] -> definition of each template field/question
-extracted_components -> intermediate detection artifacts used by questionnaire conversion
+      responsesCount: 1,
 
-Possible Firestore layout options
----------------------------------
+      deploymentType: "web",
 
-1) Flat collections
-   - /surveys/{surveyId}
-   - /templates/{templateId}
-   - /responses/{responseId}
-   - /conversions/{conversionId}
-   - /notifications/{notificationId}
-   - /extracted_components/{componentId}
+      createdBy: "admin",
 
-2) User-scoped collections
-   - /users/{userId}/surveys/{surveyId}
-   - /users/{userId}/templates/{templateId}
-   - /users/{userId}/responses/{responseId}
-   - /users/{userId}/notifications/{notificationId}
-   - /users/{userId}/conversions/{conversionId}
-   - /users/{userId}/extracted_components/{componentId}
+      createdAt: FieldValue.serverTimestamp(),
 
-Implementation hints
---------------------
+      startDate: new Date("2026-01-01"),
 
-- `TemplateRecord.components` is a nested array and can be stored directly inside the template document.
-- `ResponseRecord.answers` is also a nested array with structured answer objects.
-- `SurveyStatus` and `ResponseStatus` should be stored as strings or small integers to preserve enum behavior.
-- `createdDate`, `lastUpdated`, and `dateSubmitted` are currently strings in the app; a Firestore schema should normalize them to `Timestamp` for querying and sorting.
-- `uploadedConversionFiles` are currently held in memory; if persisted, use a separate collection or subcollection and store file storage references.
-- `notifications` are UI items and can be kept in-memory or persisted per user for history and read/unread state.
+      endDate: new Date("2026-12-31"),
 
-Derived Fields and UI metadata
-------------------------------
+      settings: {
+        allowAnonymous: false,
+        requireLogin: true,
+        maxAttempts: 1,
+      },
+    });
 
-- `templates.usage` is a display field; in Firestore it could be derived from count of linked surveys or stored as summary metadata.
-- `surveys.responses` is summary metadata and may be derived from count of corresponding `responses` documents.
-- `templateUsed` in surveys is a denormalized string; for stronger integrity use `templateId` instead.
+    // ==========================
+    // RESPONSE
+    // ==========================
+    await db.collection("responses").doc("response001").set({
+      surveyId: surveyId,
+      surveyName: "Q1 2026 Customer Survey",
 
-Summary
--------
+      templateId: templateId,
 
-The app's domain model revolves around templates, surveys, and responses. A Firestore schema should center on `templates`, `surveys`, and `responses` as primary collections, with optional user-scoped subcollections for notifications, conversions, and extracted survey components.
+      respondentId: "user001",
+
+      respondent: {
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "jane@example.com",
+        phone: "+9876543210",
+        age: 23,
+        gender: "Female",
+        civilStatus: "Single",
+        occupation: "Student",
+        educationalLevel: "College",
+        location: "Philippines",
+      },
+
+      submittedAt: FieldValue.serverTimestamp(),
+
+      source: "web",
+
+      completionRate: 100,
+
+      status: "completed",
+
+      answers: {
+        q1: "Very Satisfied",
+        q2: 5,
+      },
+
+      
+    });
+
+    console.log("✅ Users created");
+    console.log("✅ Template created");
+    console.log("✅ Survey created");
+    console.log("✅ Response created");
+    console.log("🎉 Firestore seed completed successfully!");
+  } catch (error) {
+    console.error("❌ Error seeding Firestore:", error);
+  }
+}
+
+seed();

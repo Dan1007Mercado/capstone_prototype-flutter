@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:capstone_prototype/pages/auth/login.dart' as auth;
-import 'package:capstone_prototype/widgets/app_shell.dart';
 
 // ── Palette ──────────────────────────────────────────────────────────────
 class _SignupColors {
@@ -23,7 +22,8 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -34,7 +34,8 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
@@ -160,12 +161,12 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ),
             const SizedBox(height: 32),
-            // Full Name
+            // First Name
             TextFormField(
-              controller: _fullNameController,
+              controller: _firstNameController,
               style: TextStyle(color: _SignupColors.headingText),
               decoration: InputDecoration(
-                labelText: 'Full Name',
+                labelText: 'First Name',
                 labelStyle: TextStyle(color: _SignupColors.bodyText),
                 prefixIcon: Icon(
                   Icons.person_outline,
@@ -191,7 +192,41 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               validator: (value) =>
-                  value == null || value.trim().isEmpty ? 'Enter your full name' : null,
+                  value == null || value.trim().isEmpty ? 'Enter your first name' : null,
+            ),
+            const SizedBox(height: 16),
+            // Last Name
+            TextFormField(
+              controller: _lastNameController,
+              style: TextStyle(color: _SignupColors.headingText),
+              decoration: InputDecoration(
+                labelText: 'Last Name',
+                labelStyle: TextStyle(color: _SignupColors.bodyText),
+                prefixIcon: Icon(
+                  Icons.person_outline,
+                  size: 20,
+                  color: _SignupColors.iconTeal,
+                ),
+                filled: true,
+                fillColor: _SignupColors.pageBg,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(
+                    color: _SignupColors.tealDark,
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              validator: (value) =>
+                  value == null || value.trim().isEmpty ? 'Enter your last name' : null,
             ),
             const SizedBox(height: 16),
             // Email

@@ -17,6 +17,14 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
   final _descriptionController = TextEditingController();
   final _targetController = TextEditingController(text: '250');
   String _template = 'Community Health Survey';
+  List<String> _categories = const [
+    'Health',
+    'Education',
+    'Community',
+    'Business',
+    'Environment',
+  ];
+  String _selectedCategory = 'Health';
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -39,6 +47,49 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
     _descriptionController.dispose();
     _targetController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showAddCategoryDialog() async {
+    final controller = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add a new category'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'Enter category name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final value = controller.text.trim();
+                if (value.isNotEmpty) {
+                  Navigator.pop(context, value);
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _categories = [..._categories, result];
+        _selectedCategory = result;
+      });
+    }
   }
 
   @override
@@ -332,6 +383,89 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                             value == null || value.trim().isEmpty
                                 ? 'Survey title is required'
                                 : null,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Categories
+                      DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        items: _categories
+                            .map(
+                              (category) => DropdownMenuItem(
+                                value: category,
+                                child: Text(category),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) => setState(
+                          () => _selectedCategory = value ?? _selectedCategory,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _headingText,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Categories',
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Icon(
+                              Icons.category_rounded,
+                              size: 20,
+                              color: _iconTeal,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFFF8FCFD),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: _border),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: _border),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: _iconTeal,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: _bodyText,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: OutlinedButton.icon(
+                          onPressed: _showAddCategoryDialog,
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: const Text('Add Category'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _iconTeal,
+                            side: const BorderSide(color: _border),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 14),
 
