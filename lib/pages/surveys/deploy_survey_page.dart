@@ -447,26 +447,6 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: OutlinedButton.icon(
-                          onPressed: _showAddCategoryDialog,
-                          icon: const Icon(Icons.add_rounded, size: 18),
-                          label: const Text('Add Category'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: _iconTeal,
-                            side: const BorderSide(color: _border),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 14),
 
                       // Description

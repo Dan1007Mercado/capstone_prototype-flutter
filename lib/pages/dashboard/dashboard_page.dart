@@ -114,12 +114,6 @@ class _StatsGrid extends StatelessWidget {
         icon: Icons.groups_outlined,
       ),
       const _DashboardMetric(
-        label: 'Templates used',
-        value: '42',
-        delta: '+3',
-        icon: Icons.description_outlined,
-      ),
-      const _DashboardMetric(
         label: 'Scans today',
         value: '1,204',
         delta: '-1.4%',

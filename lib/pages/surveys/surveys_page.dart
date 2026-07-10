@@ -1164,10 +1164,15 @@ class _MoreSurveyAction extends StatelessWidget {
           onDownloadOmr(survey);
           return;
         }
+        if (value == 'share') {
+          _showShareDialog(context);
+          return;
+        }
         onMockAction(value, survey);
       },
       itemBuilder: (context) => const [
         PopupMenuItem(value: 'download_omr', child: Text('Download OMR Sheet')),
+        PopupMenuItem(value: 'share', child: Text('Share')),
         PopupMenuItem(value: 'archive', child: Text('Archive')),
         PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
@@ -1181,6 +1186,222 @@ class _MoreSurveyAction extends StatelessWidget {
       iconSize: 16,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: null,
+    );
+  }
+
+  void _showShareDialog(BuildContext context) {
+    final shareLink = 'https://surveys.example.com/survey/${survey.id}';
+    
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Share Survey'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: _SurveysPageState._border),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Image.asset(
+                      'assets/images/qr.png',
+                      width: 140,
+                      height: 140,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 140,
+                          height: 140,
+                          color: _SurveysPageState._mintChipBg,
+                          child: const Icon(
+                            Icons.qr_code_2,
+                            size: 60,
+                            color: _SurveysPageState._bodyText,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _SurveysPageState._mintChipBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: _SurveysPageState._border),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SelectableText(
+                            shareLink,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: _SurveysPageState._headingText,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Tooltip(
+                          message: 'Copy link',
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Link copied to clipboard')),
+                                );
+                              },
+                              child: Icon(
+                                Icons.copy,
+                                size: 18,
+                                color: _SurveysPageState._iconTeal,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Share via',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: _SurveysPageState._headingText,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _ShareButton(
+                        icon: Icons.mail,
+                        label: 'Gmail',
+                        color: const Color(0xFFEA4335),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Share via Gmail')),
+                          );
+                        },
+                      ),
+                      _ShareButton(
+                        icon: Icons.chat,
+                        label: 'Messenger',
+                        color: const Color(0xFF0084FF),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Share via Messenger')),
+                          );
+                        },
+                      ),
+                      _ShareButton(
+                        icon: Icons.phone_android,
+                        label: 'WhatsApp',
+                        color: const Color(0xFF25D366),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Share via WhatsApp')),
+                          );
+                        },
+                      ),
+                      _ShareButton(
+                        icon: Icons.share,
+                        label: 'X',
+                        color: const Color(0xFF000000),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Share via X')),
+                          );
+                        },
+                      ),
+                      _ShareButton(
+                        icon: Icons.link,
+                        label: 'Copy Link',
+                        color: _SurveysPageState._iconTeal,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Link copied to clipboard')),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        );
+      },
+    );
+  }
+}
+
+class _ShareButton extends StatelessWidget {
+  const _ShareButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPressed,
+              borderRadius: BorderRadius.circular(12),
+              child: Icon(
+                icon,
+                color: color,
+                size: 26,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: _SurveysPageState._headingText,
+          ),
+        ),
+      ],
     );
   }
 }
