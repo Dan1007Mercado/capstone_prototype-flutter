@@ -5,6 +5,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 
+import '../../mock/mock_data.dart' as mock_data;
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../../theme/app_theme.dart';
@@ -1021,11 +1022,10 @@ class _SurveyCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _CircleAction(
-                  tooltip: 'Responses',
-                  icon: Icons.assignment_outlined,
-                  color: _SurveysPageState._bodyText,
-                  onPressed: () => onOpenResponses?.call(survey),
+                // Responses icon - red glow only if responses need review
+                _ResponsiveResponsesIcon(
+                  survey: survey,
+                  onOpenResponses: onOpenResponses,
                 ),
                 const SizedBox(width: 4),
                 _CircleAction(
@@ -1066,6 +1066,40 @@ class _SurveyCard extends StatelessWidget {
       'Dec',
     ];
     return '${months[parsed.month - 1]} ${parsed.day.toString().padLeft(2, '0')}, ${parsed.year}';
+  }
+}
+
+class _ResponsiveResponsesIcon extends StatelessWidget {
+  const _ResponsiveResponsesIcon({
+    required this.survey,
+    required this.onOpenResponses,
+  });
+
+  final SurveyRecord survey;
+  final void Function(SurveyRecord survey)? onOpenResponses;
+
+  bool _hasFlaggedResponses() {
+    // Generate mock responses for this survey and check for flagged ones
+    final responses = mock_data.buildMockResponses(survey);
+    final flaggedCount = responses.where((resp) {
+      // Flag responses with 2+ low scores
+      final lowScores = resp.answers.where((a) => a.score < 2).length;
+      return lowScores > 1;
+    }).length;
+    return flaggedCount > 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasFlagged = _hasFlaggedResponses();
+
+    return _CircleAction(
+      tooltip: 'Responses',
+      icon: Icons.assignment_outlined,
+      color: _SurveysPageState._bodyText,
+      hasAttention: hasFlagged,
+      onPressed: () => onOpenResponses?.call(survey),
+    );
   }
 }
 
@@ -1114,12 +1148,14 @@ class _CircleAction extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onPressed,
+    this.hasAttention = false,
   });
 
   final String tooltip;
   final IconData icon;
   final Color color;
   final VoidCallback? onPressed;
+  final bool hasAttention;
 
   @override
   Widget build(BuildContext context) {
@@ -1130,14 +1166,34 @@ class _CircleAction extends StatelessWidget {
         shape: const CircleBorder(
           side: BorderSide(color: _SurveysPageState._border),
         ),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: SizedBox(
-            width: 32,
-            height: 32,
-            child: Icon(icon, size: 16, color: color),
-          ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onPressed,
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(icon, size: 16, color: color),
+              ),
+            ),
+            if (hasAttention)
+              Positioned(
+                right: -2,
+                top: -2,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

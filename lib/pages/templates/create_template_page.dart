@@ -5,119 +5,16 @@ import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../../widgets/common_widgets.dart';
 
-class CreateTemplatePage extends StatefulWidget {
+class CreateTemplatePage extends StatelessWidget {
   const CreateTemplatePage({super.key});
 
   @override
-  State<CreateTemplatePage> createState() => _CreateTemplatePageState();
+  Widget build(BuildContext context) {
+    return const TemplateBuilderPage(style: TemplateStyle.traditional);
+  }
 }
 
 enum TemplateBuilderMode { create, edit, preview }
-
-class _CreateTemplatePageState extends State<CreateTemplatePage> {
-  TemplateStyle _style = TemplateStyle.traditional;
-
-  static const Color _pageBg = Color(0xFFF4F7F8);
-  static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _border = Color(0xFFDDECEF);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _pageBg,
-      appBar: AppBar(
-        title: const Text('Create Template'),
-        backgroundColor: _cardWhite,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _buildStyleSelectionCard(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStyleSelectionCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _cardWhite,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionHeader(
-            title: 'Step 1',
-            subtitle: 'Select template style before entering the builder.',
-          ),
-          const SizedBox(height: 16),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth > 760;
-              final children = [
-                _StyleOptionCard(
-                  title: 'Traditional Form',
-                  subtitle: 'Question 1, Question 2, Question 3, Question 4',
-                  selected: _style == TemplateStyle.traditional,
-                  onTap: () => setState(() => _style = TemplateStyle.traditional),
-                ),
-                _StyleOptionCard(
-                  title: 'Card Per Page',
-                  subtitle: 'One Question per screen',
-                  selected: _style == TemplateStyle.cardPerPage,
-                  onTap: () => setState(() => _style = TemplateStyle.cardPerPage),
-                ),
-              ];
-
-              if (wide) {
-                return Row(
-                  children: [
-                    Expanded(child: children[0]),
-                    const SizedBox(width: 16),
-                    Expanded(child: children[1]),
-                  ],
-                );
-              }
-
-              return Column(
-                children: [
-                  children[0],
-                  const SizedBox(height: 16),
-                  children[1],
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 18),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => TemplateBuilderPage(style: _style),
-                  ),
-                );
-              },
-              child: const Text('Proceed to Template Builder'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 enum TemplateStyle { traditional, cardPerPage }
 
 class TemplateBuilderPage extends StatefulWidget {

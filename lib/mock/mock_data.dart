@@ -364,7 +364,7 @@ String formatDateTimeLabel(DateTime date) {
   return '${formatDateLabel(date)} $hour:$minute $suffix';
 }
 
-List<ResponseQuestionAnswer> buildQuestionAnswers(int seed) {
+List<ResponseQuestionAnswer> buildQuestionAnswers(int seed, {bool review = false}) {
   const answerLabels = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
   const questionText = <String>[
     'How would you rate your overall health?',
@@ -390,7 +390,13 @@ List<ResponseQuestionAnswer> buildQuestionAnswers(int seed) {
   ];
 
   return List.generate(questionText.length, (index) {
-    final score = ((seed * 3 + index * 2) % 5) + 1;
+    var score = ((seed * 3 + index * 2) % 5) + 1;
+
+    if (!review && score == 1) {
+      // Keep at most one low-scoring answer for good responses.
+      score = index % 5 == 0 ? 1 : 2;
+    }
+
     return ResponseQuestionAnswer(
       questionNumber: index + 1,
       questionText: questionText[index],
@@ -474,7 +480,8 @@ List<ResponseRecord> buildMockResponses(SurveyRecord survey) {
     final responseId = 'RSP-2026-${(index + 1).toString().padLeft(4, '0')}';
     final submitted = DateTime(2026, 7, 1 + (index % 3), 8 + (index % 10), (index * 7) % 60);
     final sync = submitted.add(Duration(hours: 1 + (index % 5), minutes: (index * 4) % 50));
-    final answers = buildQuestionAnswers(seed);
+    final isReviewResponse = index >= 46;
+    final answers = buildQuestionAnswers(seed, review: isReviewResponse);
     final averageScore = answers.fold<double>(0, (sum, answer) => sum + answer.score) / answers.length;
     return ResponseRecord(
       responseId: responseId,

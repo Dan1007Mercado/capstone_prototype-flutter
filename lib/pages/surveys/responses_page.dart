@@ -32,6 +32,7 @@ class ResponsesPage extends StatefulWidget {
 class _ResponsesPageState extends State<ResponsesPage> {
   final _searchController = TextEditingController();
   String _query = '';
+  String _filterType = 'all'; // 'all', 'needs_review', 'good'
 
   @override
   void dispose() {
@@ -40,18 +41,35 @@ class _ResponsesPageState extends State<ResponsesPage> {
   }
 
   List<ResponseRecord> get _filteredResponses {
+    var responses = widget.responses;
+    
+    // Filter by type (needs review or good)
+    if (_filterType == 'needs_review') {
+      responses = responses.where(_responseNeedsReview).toList();
+    } else if (_filterType == 'good') {
+      responses = responses.where((response) => !_responseNeedsReview(response)).toList();
+    }
+    
+    // Filter by search query
     if (_query.trim().isEmpty) {
-      return widget.responses;
+      return responses;
     }
     final lower = _query.toLowerCase();
-    return widget.responses
+    return responses
         .where((response) => response.responseId.toLowerCase().contains(lower))
         .toList();
+  }
+
+  bool _responseNeedsReview(ResponseRecord response) {
+    return response.answers.where((a) => a.score < 2).length > 1;
   }
 
   @override
   Widget build(BuildContext context) {
     final filtered = _filteredResponses;
+    final reviewResponses = filtered.where(_responseNeedsReview).toList();
+    final goodResponses = filtered.where((response) => !_responseNeedsReview(response)).toList();
+    final reviewDisplay = reviewResponses.take(5).toList();
 
     return Scaffold(
       backgroundColor: AppPalette.teal50,
@@ -174,87 +192,149 @@ class _ResponsesPageState extends State<ResponsesPage> {
                   ),
                   const SizedBox(height: 14),
                   _PanelCard(
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${filtered.length} responses shown',
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  color: _responsesHeadingText,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${filtered.length} responses shown',
+                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      color: _responsesHeadingText,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    'Frontend-only sample responses for this survey.',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: _responsesBodyText,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 3),
-                              Text(
-                                'Frontend-only sample responses for this survey.',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: _responsesBodyText,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 12),
+                            _StatusPill(
+                              label: widget.survey.status.name.toUpperCase(),
+                              color: widget.survey.status == SurveyStatus.active ? AppPalette.success : AppPalette.primary500,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        _StatusPill(
-                          label: widget.survey.status.name.toUpperCase(),
-                          color: widget.survey.status == SurveyStatus.active ? AppPalette.success : AppPalette.primary500,
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _FilterChip(
+                              label: 'All Responses (${widget.responses.length})',
+                              isSelected: _filterType == 'all',
+                              onPressed: () => setState(() => _filterType = 'all'),
+                              color: Colors.blue,
+                            ),
+                            _FilterChip(
+                              label: 'Needs Review (${reviewResponses.length})',
+                              isSelected: _filterType == 'needs_review',
+                              onPressed: () => setState(() => _filterType = 'needs_review'),
+                              color: Colors.orange,
+                            ),
+                            _FilterChip(
+                              label: 'Good (${goodResponses.length})',
+                              isSelected: _filterType == 'good',
+                              onPressed: () => setState(() => _filterType = 'good'),
+                              color: Colors.green,
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _PanelCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(6, 4, 6, 12),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Response overview',
+                  if (filtered.isNotEmpty)
+                    _PanelCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(6, 4, 6, 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _filterType == 'needs_review'
+                                      ? 'Needs Review'
+                                      : _filterType == 'good'
+                                          ? 'Good Responses'
+                                          : 'All Responses',
                                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                     color: _responsesHeadingText,
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                              ),
-                              Text(
-                                '${filtered.length} / ${widget.responses.length}',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppPalette.primary600,
-                                  fontWeight: FontWeight.w700,
+                                const SizedBox(height: 4),
+                                Text(
+                                  _filterType == 'needs_review'
+                                      ? 'Showing ${filtered.length} responses flagged for review.'
+                                      : _filterType == 'good'
+                                          ? 'Showing ${filtered.length} high-quality responses.'
+                                          : 'Showing ${filtered.length} total responses.',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: _responsesBodyText,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          if (isMobile)
+                            _ResponsesMobileList(
+                              survey: widget.survey,
+                              responses: filtered,
+                              onView: _openDetails,
+                            )
+                          else if (isTablet)
+                            _ResponsesTabletTable(
+                              survey: widget.survey,
+                              responses: filtered,
+                              onView: _openDetails,
+                            )
+                          else
+                            _ResponsesDesktopTable(
+                              survey: widget.survey,
+                              responses: filtered,
+                              onView: _openDetails,
+                            ),
+                        ],
+                      ),
+                    )
+                  else
+                    _PanelCard(
+                      padding: const EdgeInsets.all(24),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.inbox_outlined,
+                              size: 42,
+                              color: _responsesBodyText,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No responses found.',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: _responsesBodyText,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        if (isMobile)
-                          _ResponsesMobileList(
-                            survey: widget.survey,
-                            responses: filtered,
-                            onView: _openDetails,
-                          )
-                        else if (isTablet)
-                          _ResponsesTabletTable(
-                            survey: widget.survey,
-                            responses: filtered,
-                            onView: _openDetails,
-                          )
-                        else
-                          _ResponsesDesktopTable(
-                            survey: widget.survey,
-                            responses: filtered,
-                            onView: _openDetails,
-                          ),
-                      ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -322,6 +402,50 @@ class _StatusPill extends StatelessWidget {
           fontSize: 10,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onPressed,
+    required this.color,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onPressed;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isSelected ? color.withValues(alpha: 0.20) : color.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? color.withValues(alpha: 0.5) : color.withValues(alpha: 0.2),
+              width: isSelected ? 2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            ),
+          ),
         ),
       ),
     );
@@ -524,53 +648,90 @@ class _ResponseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Flag responses only if they have multiple low scores (quality control)
+    final lowScoreCount = response.answers.where((a) => a.score < 2).length;
+    final needsReview = lowScoreCount > 1; // Only flag if 2+ low scores
+
     return _PanelCard(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      response.responseId,
-                      style: const TextStyle(fontWeight: FontWeight.w800, color: _responsesHeadingText),
+          if (needsReview)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                border: Border(
+                  bottom: BorderSide(color: Colors.orange[200]!, width: 1),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange[700]),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Needs Review',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.orange[900],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      response.respondentName,
-                      style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                  ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            response.responseId,
+                            style: const TextStyle(fontWeight: FontWeight.w800, color: _responsesHeadingText),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            response.respondentName,
+                            style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _StatusPill(
+                      label: responseStatusLabel(response.status),
+                      color: responseStatusColor(response.status),
                     ),
                   ],
                 ),
-              ),
-              _StatusPill(
-                label: responseStatusLabel(response.status),
-                color: responseStatusColor(response.status),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          DetailRow(label: 'Survey', value: response.surveyName),
-          const SizedBox(height: 6),
-          DetailRow(label: 'Sync Date', value: response.syncDate),
-          const SizedBox(height: 6),
-          DetailRow(label: 'Submitted', value: response.dateSubmitted),
-          const SizedBox(height: 14),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton.icon(
-              onPressed: onView,
-              icon: const Icon(Icons.visibility_outlined, size: 16),
-              label: const Text('View'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppPalette.primary600,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-              ),
+                const SizedBox(height: 14),
+                DetailRow(label: 'Survey', value: response.surveyName),
+                const SizedBox(height: 6),
+                DetailRow(label: 'Sync Date', value: response.syncDate),
+                const SizedBox(height: 6),
+                DetailRow(label: 'Submitted', value: response.dateSubmitted),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton.icon(
+                    onPressed: onView,
+                    icon: const Icon(Icons.visibility_outlined, size: 16),
+                    label: const Text('View'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppPalette.primary600,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

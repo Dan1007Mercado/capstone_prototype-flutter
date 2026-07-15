@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../mock/mock_data.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
-import 'top_survey_performance.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({
@@ -75,10 +74,6 @@ class DashboardPage extends StatelessWidget {
                       child: Column(
                         children: [
                           _StatsGrid(onOpenAnalytics: onOpenAnalytics),
-                          const SizedBox(height: 8),
-                          TopSurveyPerformance(
-                            onViewAnalytics: () => onOpenAnalytics(),
-                          ),
                           const SizedBox(height: 8),
                           const _ActivityPanel(),
                         ],
