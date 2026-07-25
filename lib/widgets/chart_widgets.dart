@@ -120,14 +120,14 @@ class DonutChartCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${points.first.value.toStringAsFixed(0)}%',
+                      '${(points.isNotEmpty ? points.first.value : 0).toStringAsFixed(0)}%',
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      points.first.label,
+                      points.isNotEmpty ? points.first.label : 'No Data',
                       style: TextStyle(
                         color: theme.onSurfaceVariant,
                         fontSize: 13,
@@ -438,11 +438,13 @@ class _SmallDonutChart extends StatelessWidget {
     // that's the useful, comparable takeaway, not just "whatever the
     // first category happens to be".
     var dominantIndex = 0;
-    for (var i = 1; i < points.length; i++) {
-      if (points[i].value > points[dominantIndex].value) dominantIndex = i;
+    if (points.isNotEmpty) {
+      for (var i = 1; i < points.length; i++) {
+        if (points[i].value > points[dominantIndex].value) dominantIndex = i;
+      }
     }
-    final dominant = points[dominantIndex];
-    final dominantColor = colors[dominantIndex % colors.length];
+    final dominant = points.isNotEmpty ? points[dominantIndex] : const ChartPoint('No Data', 0);
+    final dominantColor = colors.isNotEmpty ? colors[dominantIndex % colors.length] : AppColors.primary;
 
     return Column(
       children: [
@@ -559,7 +561,14 @@ class _HorizontalBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final max = points.map((e) => e.value).reduce(math.max);
+    if (points.isEmpty) {
+      return const SizedBox(
+        height: 36,
+        child: Center(child: Text('No response data available', style: TextStyle(fontSize: 12, color: Colors.grey))),
+      );
+    }
+    final maxVal = points.map((e) => e.value).reduce(math.max);
+    final max = maxVal <= 0 ? 1.0 : maxVal;
     final theme = context.appTheme;
     // Give this chart an explicit height (matching its sibling chart
     // builders, which all use a fixed SizedBox) so AnimatedSwitcher never
@@ -585,7 +594,7 @@ class _HorizontalBarChart extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
-                        value: max == 0 ? 0 : point.value / max,
+                        value: (point.value / max).clamp(0.0, 1.0),
                         minHeight: 12,
                         backgroundColor: theme.surfaceContainerHighest,
                         valueColor: AlwaysStoppedAnimation(accent),
@@ -659,7 +668,14 @@ class _BarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final max = points.map((e) => e.value).reduce(math.max);
+    if (points.isEmpty) {
+      return const SizedBox(
+        height: 180,
+        child: Center(child: Text('No data available', style: TextStyle(fontSize: 12, color: Colors.grey))),
+      );
+    }
+    final maxVal = points.map((e) => e.value).reduce(math.max);
+    final max = maxVal <= 0 ? 1.0 : maxVal;
     final theme = context.appTheme;
     return SizedBox(
       height: 180,
@@ -681,7 +697,7 @@ class _BarChart extends StatelessWidget {
                   const SizedBox(height: 8),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
-                    height: 130 * (point.value / max),
+                    height: 130 * (point.value / max).clamp(0.0, 1.0),
                     decoration: BoxDecoration(
                       color: accent,
                       borderRadius: const BorderRadius.vertical(
@@ -729,8 +745,10 @@ class _LinePainter extends CustomPainter {
     const padding = 24.0;
     final plotWidth = size.width - padding * 2;
     final plotHeight = size.height - padding * 2;
-    final max = points.map((e) => e.value).reduce(math.max);
-    final min = points.map((e) => e.value).reduce(math.min);
+    final maxVal = points.map((e) => e.value).reduce(math.max);
+    final minVal = points.map((e) => e.value).reduce(math.min);
+    final max = maxVal;
+    final min = minVal;
     final range = (max - min).abs() < 0.001 ? 1.0 : max - min;
 
     final gridPaint = Paint()
@@ -749,10 +767,11 @@ class _LinePainter extends CustomPainter {
     final pointsPath = Path();
     final fillPath = Path();
     final pointOffsets = <Offset>[];
+    final stepDiv = points.length > 1 ? (points.length - 1) : 1;
 
     for (var i = 0; i < points.length; i++) {
       final point = points[i];
-      final x = padding + plotWidth * (i / (points.length - 1));
+      final x = padding + plotWidth * (i / stepDiv);
       final y = padding + plotHeight * (1 - ((point.value - min) / range));
       final offset = Offset(x, y);
       pointOffsets.add(offset);

@@ -315,15 +315,24 @@ List<QuestionInsight> buildQuestionInsights() {
     'Q20 Final Rating',
   ];
   final chartTypes = ChartType.values;
+  final variableValues = [
+    [10, 2, 3, 5, 8],
+    [15, 8, 12, 6, 9],
+    [7, 11, 5, 14, 3],
+    [12, 4, 9, 7, 11],
+    [6, 13, 8, 5, 10],
+    [9, 7, 4, 12, 6],
+  ];
 
   return List.generate(titles.length, (index) {
     final seed = index + 1;
+    final vals = variableValues[index % variableValues.length];
     final points = <ChartPoint>[
-      ChartPoint('Strongly Disagree', 6 + seed % 5),
-      ChartPoint('Disagree', 10 + (seed * 2) % 8),
-      ChartPoint('Neutral', 18 + (seed * 3) % 12),
-      ChartPoint('Agree', 26 + (seed * 4) % 16),
-      ChartPoint('Strongly Agree', 34 + (seed * 5) % 20),
+      ChartPoint('Strongly Disagree', vals[0].toDouble()),
+      ChartPoint('Disagree', vals[1].toDouble()),
+      ChartPoint('Neutral', vals[2].toDouble()),
+      ChartPoint('Agree', vals[3].toDouble()),
+      ChartPoint(' Agree', vals[4].toDouble()),
     ];
     return QuestionInsight(
       title: titles[index],

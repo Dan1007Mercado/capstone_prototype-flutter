@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:capstone_prototype/pages/auth/login.dart' as auth;
 import '../../pages/auth/login.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';

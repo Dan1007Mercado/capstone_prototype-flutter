@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../state/app_state.dart';
-import '../../theme/app_theme.dart';
-import '../../widgets/common_widgets.dart';
 
 class DeploySurveyPage extends StatefulWidget {
   const DeploySurveyPage({super.key});
@@ -388,7 +386,7 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
 
                       // Categories
                       DropdownButtonFormField<String>(
-                        value: _selectedCategory,
+                        initialValue: _selectedCategory,
                         items: _categories
                             .map(
                               (category) => DropdownMenuItem(
@@ -513,7 +511,7 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
 
                       // Template Selection
                       DropdownButtonFormField<String>(
-                        value: _template,
+                        initialValue: _template,
                         items: const [
                           DropdownMenuItem(
                             value: 'Community Health Survey',
@@ -585,7 +583,7 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
 
                       // Target Response Count
                       DropdownButtonFormField<String>(
-                        value: _targetController.text,
+                        initialValue: _targetController.text,
                         items: const [
                           DropdownMenuItem(value: '100', child: Text('100')),
                           DropdownMenuItem(value: '250', child: Text('250')),
@@ -780,6 +778,9 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                                   ),
                                 ),
                               );
+                              Future.delayed(const Duration(milliseconds: 500), () {
+                                if (context.mounted) Navigator.pop(context);
+                              });
                             },
                             icon: const Icon(Icons.rocket_launch_rounded, size: 16),
                             label: const Text('Deploy Survey'),

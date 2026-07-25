@@ -5,7 +5,6 @@ import '../../state/app_state.dart';
 import '../../mock/mock_data.dart' as mock_data;
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
-import '../../widgets/paginated_table_card.dart';
 import 'create_template_page.dart';
 
 class TemplatesPage extends StatelessWidget {

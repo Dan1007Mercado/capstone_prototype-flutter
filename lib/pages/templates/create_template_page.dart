@@ -177,7 +177,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ),
           const SizedBox(height: 24),
           Align(
-            alignment: Alignment.centerRight,
+            alignment: Alignment.centerLeft,
             child: FilledButton(
               onPressed: _canEdit
                   ? () {

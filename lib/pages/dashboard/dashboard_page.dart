@@ -119,70 +119,34 @@ class _StatsGrid extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 760 ? 4 : 2;
+        final isLarge = constraints.maxWidth >= 760;
 
-        if (columns == 2 && stats.length.isOdd) {
-          return Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetricCard(
-                      metric: stats[0],
-                      onTap: stats[0].label == 'AI conversion'
-                          ? () => onOpenAnalytics()
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MetricCard(
-                      metric: stats[1],
-                      onTap: stats[1].label == 'AI conversion'
-                          ? () => onOpenAnalytics()
-                          : null,
-                    ),
-                  ),
-                ],
+        return Row(
+          children: [
+            Expanded(
+              child: _MetricCard(
+                metric: stats[0],
+                onTap: stats[0].label == 'AI conversion'
+                    ? () => onOpenAnalytics()
+                    : null,
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: (constraints.maxWidth - 12) / 2,
-                    child: _MetricCard(
-                      metric: stats[2],
-                      onTap: stats[2].label == 'AI conversion'
-                          ? () => onOpenAnalytics()
-                          : null,
-                    ),
-                  ),
-                ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _MetricCard(
+                metric: stats[1],
+                onTap: stats[1].label == 'AI conversion'
+                    ? () => onOpenAnalytics()
+                    : null,
               ),
+            ),
+            if (isLarge) ...[
+              const SizedBox(width: 12),
+              const Expanded(child: SizedBox()),
+              const SizedBox(width: 12),
+              const Expanded(child: SizedBox()),
             ],
-          );
-        }
-
-        return GridView.builder(
-          itemCount: stats.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: columns == 4 ? 0.95 : 0.9,
-          ),
-          itemBuilder: (context, index) {
-            final metric = stats[index];
-            return _MetricCard(
-              metric: metric,
-              onTap: metric.label == 'AI conversion'
-                  ? () => onOpenAnalytics()
-                  : null,
-            );
-          },
+          ],
         );
       },
     );

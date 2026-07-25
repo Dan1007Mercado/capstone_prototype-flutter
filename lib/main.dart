@@ -4,7 +4,11 @@ import 'pages/landing/splash_landing.dart';
 import 'theme/app_theme.dart';
 import 'state/app_state.dart';
 
-void main() {
+import 'services/firebase_analytics_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FirebaseAnalyticsService().initialize();
   runApp(const TalaanScanApp());
 }
 

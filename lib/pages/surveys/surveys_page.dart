@@ -647,12 +647,12 @@ class _SurveysHero extends StatelessWidget {
           bottom: Radius.circular(20),
         ),
         border: Border.all(
-          color: const Color.fromARGB(255, 92, 5, 5).withOpacity(0.16),
+          color: const Color.fromARGB(255, 92, 5, 5).withValues(alpha: 0.16),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
