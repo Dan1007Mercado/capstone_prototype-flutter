@@ -1460,26 +1460,21 @@ class _StatusBadge extends StatelessWidget {
       SurveyStatus.inactive => 'Inactive',
     };
 
-    return Align(
-      alignment: Alignment.centerLeft,
-      widthFactor: 1,
-      heightFactor: 1,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: status == SurveyStatus.active
-              ? _SurveysPageState._mintChipBg
-              : color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: color.withValues(alpha: 0.14)),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: status == SurveyStatus.active
+            ? _SurveysPageState._mintChipBg
+            : color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.14)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -1596,32 +1591,36 @@ class _MoreSurveyAction extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+          constraints: const BoxConstraints(maxWidth: 420),
           title: const Text('Share Survey'),
           content: SizedBox(
-            width: double.maxFinite,
+            width: 360,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: _SurveysPageState._border),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Image.asset(
                       'assets/images/qr.png',
-                      width: 140,
-                      height: 140,
+                      width: 112,
+                      height: 112,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          width: 140,
-                          height: 140,
+                          width: 112,
+                          height: 112,
                           color: _SurveysPageState._mintChipBg,
                           child: const Icon(
                             Icons.qr_code_2,
-                            size: 60,
+                            size: 48,
                             color: _SurveysPageState._bodyText,
                           ),
                         );
@@ -1680,8 +1679,8 @@ class _MoreSurveyAction extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
+                    spacing: 10,
+                    runSpacing: 10,
                     alignment: WrapAlignment.center,
                     children: [
                       _ShareButton(
@@ -1770,10 +1769,11 @@ class _ShareButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 56,
-          height: 56,
+          width: 52,
+          height: 52,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
@@ -1787,7 +1787,7 @@ class _ShareButton extends StatelessWidget {
               child: Icon(
                 icon,
                 color: color,
-                size: 26,
+                size: 24,
               ),
             ),
           ),
@@ -2271,7 +2271,12 @@ class _WebSurveyRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Expanded(child: _StatusBadge(status: survey.status)),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _StatusBadge(status: survey.status),
+            ),
+          ),
           Expanded(
             child: Text(
               '${survey.responses}',

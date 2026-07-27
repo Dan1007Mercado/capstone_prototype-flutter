@@ -958,7 +958,7 @@ class _WebResponseOverview extends StatelessWidget {
                   child: Text(
                     'Response Overview',
                     style: GoogleFonts.inter(
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: theme.onSurface,
                     ),

@@ -718,7 +718,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           const SizedBox(height: 16),
           TextField(
             decoration: const InputDecoration(
-              labelText: 'Label',
+              labelText: 'Component Name',
               prefixIcon: Icon(Icons.label_outline, size: 20),
             ),
             style: isWeb ? GoogleFonts.inter(fontSize: 14) : null,
@@ -855,7 +855,6 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
     setState(() {
       _components[_selectedIndex] = updater(_components[_selectedIndex]);
     });
-    _syncControllersWithSelection();
   }
 
   Future<void> _showAddChoiceDialog() async {
