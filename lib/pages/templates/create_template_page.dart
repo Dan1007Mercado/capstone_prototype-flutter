@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../mock/mock_data.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
+import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/responsive_shell.dart';
+import '../../widgets/web_sidebar.dart';
+import '../../widgets/web_topbar.dart';
+import '../auth/login.dart';
+import '../settings/settings_page.dart';
 
 class CreateTemplatePage extends StatelessWidget {
   const CreateTemplatePage({super.key});
@@ -42,13 +49,18 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
   final _components = <TemplateComponent>[];
   int _selectedIndex = 0;
 
+  // ── Design tokens (kept in sync with SurveysPage's web palette) ──────────
   static const Color _tealDark = Color(0xFF0F9B9B);
+  static const Color _tealLight = Color(0xFF2DD4CF);
+  static const Color _iconTeal = Color(0xFF14B8A6);
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
   static const Color _headingText = Color(0xFF0E2A2E);
   static const Color _bodyText = Color(0xFF7C8A90);
   static const Color _border = Color(0xFFDDECEF);
+  static const Color _infoBlue = Color(0xFF2563EB);
+  static const Color _successGreen = Color(0xFF16A34A);
 
   bool get _canEdit => widget.mode != TemplateBuilderMode.preview;
 
@@ -129,6 +141,24 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
             ? 'Preview Template'
             : 'Template Builder';
 
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 900) {
+          return _buildWebLayout(context, appState, title);
+        }
+        return _buildMobileLayout(context, appState, title);
+      },
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MOBILE LAYOUT — no sidebar, matches SurveysPage mobile behavior
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildMobileLayout(
+    BuildContext context,
+    AppState appState,
+    String title,
+  ) {
     return Scaffold(
       backgroundColor: _pageBg,
       appBar: AppBar(
@@ -144,75 +174,60 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Add Component'),
             ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: _buildEditorContent(context, appState),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // WEB LAYOUT — sidebar + topbar shell, matching SurveysPage's web design
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildWebLayout(
+    BuildContext context,
+    AppState appState,
+    String title,
+  ) {
+    return Scaffold(
+      backgroundColor: _pageBg,
+      body: Row(
         children: [
-          _buildTemplateNameCard(),
-          const SizedBox(height: 16),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth > 1100;
-              final builderPane = _buildComponentList(context);
-              final propsPane = _buildPropertiesPane(context);
-
-              if (wide) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 6, child: builderPane),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 4, child: propsPane),
-                  ],
-                );
-              }
-
-              return Column(
-                children: [
-                  builderPane,
-                  const SizedBox(height: 16),
-                  propsPane,
-                ],
+          WebSidebar(
+            currentIndex: 2,
+            onNavigate: (index) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(
+                  builder: (_) => ResponsiveShell(initialIndex: index),
+                ),
+                (route) => false,
+              );
+            },
+            onLogout: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+                (route) => false,
               );
             },
           ),
-          const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: FilledButton(
-              onPressed: _canEdit
-                  ? () {
-                      final template = TemplateRecord(
-                        id: widget.template?.id ?? 'TMP-${DateTime.now().millisecondsSinceEpoch}',
-                        name: _nameController.text.trim().isEmpty
-                            ? 'Untitled Template'
-                            : _nameController.text.trim(),
-                        category: 'Survey',
-                        usage: '${_components.length} components',
-                        lastUpdated: formatDateLabel(DateTime.now()),
-                        components: List.unmodifiable(_components),
-                      );
-                      if (widget.mode == TemplateBuilderMode.edit && widget.template != null) {
-                        appState.updateTemplate(template);
-                      } else {
-                        appState.addTemplate(
-                          name: template.name,
-                          category: template.category,
-                          usage: template.usage,
-                          lastUpdated: template.lastUpdated,
-                          components: template.components,
-                        );
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(widget.mode == TemplateBuilderMode.edit
-                              ? 'Template updated successfully'
-                              : 'Template saved to mock library'),
-                        ),
-                      );
-                      Navigator.pop(context);
-                    }
-                  : null,
-              child: Text(widget.mode == TemplateBuilderMode.edit ? 'Save Changes' : 'Save Template'),
+          Expanded(
+            child: Column(
+              children: [
+                WebTopbar(
+                  onSettings: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SettingsPage(),
+                    ),
+                  ),
+                  unreadNotifications: appState.unreadNotifications,
+                ),
+                Expanded(
+                  child: _buildEditorContent(
+                    context,
+                    appState,
+                    padding: const EdgeInsets.all(SpacingTokens.xxl),
+                    header: _buildWebHeader(context, title),
+                    isWeb: true,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -220,33 +235,276 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
     );
   }
 
-  Widget _buildTemplateNameCard() {
+  Widget _buildEditorContent(
+    BuildContext context,
+    AppState appState, {
+    EdgeInsets padding = const EdgeInsets.all(20),
+    Widget? header,
+    bool isWeb = false,
+  }) {
+    return ListView(
+      padding: padding,
+      children: [
+        if (header != null) ...[
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1280),
+              child: header,
+            ),
+          ),
+          const SizedBox(height: SpacingTokens.xxl),
+        ],
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1280),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (isWeb) ...[
+                  _WebTemplateStatsRow(
+                    totalComponents: _components.length,
+                    requiredCount:
+                        _components.where((c) => c.isRequired).length,
+                    categoryCount:
+                        _components.map((c) => c.category).toSet().length,
+                    styleLabel: widget.style == TemplateStyle.traditional
+                        ? 'Traditional'
+                        : 'Card / Page',
+                  ),
+                  const SizedBox(height: SpacingTokens.xxl),
+                ],
+                _buildTemplateNameCard(isWeb: isWeb),
+                const SizedBox(height: 16),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth > 1100;
+                    final builderPane = _buildComponentList(context, isWeb: isWeb);
+                    final propsPane = _buildPropertiesPane(context, isWeb: isWeb);
+
+                    if (wide) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 6, child: builderPane),
+                          const SizedBox(width: 16),
+                          Expanded(flex: 4, child: propsPane),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        builderPane,
+                        const SizedBox(height: 16),
+                        propsPane,
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: isWeb
+                      ? FilledButton.icon(
+                          onPressed: _canEdit
+                              ? () => _saveTemplate(context, appState)
+                              : null,
+                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                          label: Text(widget.mode == TemplateBuilderMode.edit
+                              ? 'Save Changes'
+                              : 'Save Template'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _tealDark,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 22,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            textStyle: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        )
+                      : FilledButton(
+                          onPressed: _canEdit
+                              ? () => _saveTemplate(context, appState)
+                              : null,
+                          child: Text(widget.mode == TemplateBuilderMode.edit
+                              ? 'Save Changes'
+                              : 'Save Template'),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWebHeader(BuildContext context, String title) {
+    return Container(
+      padding: const EdgeInsets.all(SpacingTokens.lg),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_tealLight, _tealDark],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: _tealDark.withValues(alpha: 0.25),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Material(
+            color: Colors.white.withValues(alpha: 0.18),
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () => Navigator.pop(context),
+              child: const SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(
+                  Icons.arrow_back_rounded,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.style == TemplateStyle.traditional
+                      ? 'Traditional form layout with grouped components.'
+                      : 'Card per page layout with one question per screen.',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (_canEdit)
+            FilledButton.icon(
+              onPressed: _showAddComponentSheet,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Component'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: _headingText,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                ),
+                minimumSize: const Size(0, 44),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                textStyle: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _saveTemplate(BuildContext context, AppState appState) {
+    final template = TemplateRecord(
+      id: widget.template?.id ?? 'TMP-${DateTime.now().millisecondsSinceEpoch}',
+      name: _nameController.text.trim().isEmpty
+          ? 'Untitled Template'
+          : _nameController.text.trim(),
+      category: 'Survey',
+      usage: '${_components.length} components',
+      lastUpdated: formatDateLabel(DateTime.now()),
+      components: List.unmodifiable(_components),
+    );
+    if (widget.mode == TemplateBuilderMode.edit && widget.template != null) {
+      appState.updateTemplate(template);
+    } else {
+      appState.addTemplate(
+        name: template.name,
+        category: template.category,
+        usage: template.usage,
+        lastUpdated: template.lastUpdated,
+        components: template.components,
+      );
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(widget.mode == TemplateBuilderMode.edit
+            ? 'Template updated successfully'
+            : 'Template saved to mock library'),
+      ),
+    );
+    Navigator.pop(context);
+  }
+
+  Widget _buildTemplateNameCard({bool isWeb = false}) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: _cardWhite,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border),
+        borderRadius: BorderRadius.circular(isWeb ? 18 : 20),
+        border: Border.all(color: _border, width: isWeb ? 0.5 : 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: isWeb ? 0.03 : 0.04),
+            blurRadius: isWeb ? 14 : 18,
+            offset: Offset(0, isWeb ? 6 : 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionHeader(
-            title: 'Builder',
-            subtitle: widget.style == TemplateStyle.traditional
-                ? 'Traditional Form layout with grouped components.'
-                : 'Card Per Page layout with one question per screen.',
-          ),
+          isWeb
+              ? _WebSectionHeading(
+                  title: 'Builder',
+                  subtitle: widget.style == TemplateStyle.traditional
+                      ? 'Traditional Form layout with grouped components.'
+                      : 'Card Per Page layout with one question per screen.',
+                )
+              : SectionHeader(
+                  title: 'Builder',
+                  subtitle: widget.style == TemplateStyle.traditional
+                      ? 'Traditional Form layout with grouped components.'
+                      : 'Card Per Page layout with one question per screen.',
+                ),
           const SizedBox(height: 16),
           TextField(
             controller: _nameController,
+            style: isWeb ? GoogleFonts.inter(fontSize: 14) : null,
             decoration: const InputDecoration(
               labelText: 'Template Name',
               prefixIcon: Icon(Icons.edit_outlined, size: 20),
@@ -257,114 +515,175 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
     );
   }
 
-  Widget _buildComponentList(BuildContext context) {
+  Widget _buildComponentList(BuildContext context, {bool isWeb = false}) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: _cardWhite,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border),
+        borderRadius: BorderRadius.circular(isWeb ? 18 : 20),
+        border: Border.all(color: _border, width: isWeb ? 0.5 : 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: isWeb ? 0.03 : 0.04),
+            blurRadius: isWeb ? 14 : 18,
+            offset: Offset(0, isWeb ? 6 : 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader(
-            title: 'Components',
-            subtitle: 'Drag to reorder. Select a card to edit its properties.',
-          ),
-          const SizedBox(height: 16),
-          ReorderableListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _components.length,
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (newIndex > oldIndex) newIndex -= 1;
-                final item = _components.removeAt(oldIndex);
-                _components.insert(newIndex, item);
-                _selectedIndex = newIndex;
-              });
-            },
-            itemBuilder: (context, index) {
-              final component = _components[index];
-              final selected = index == _selectedIndex;
-              return Padding(
-                key: ValueKey(component.label + index.toString()),
-                padding: const EdgeInsets.only(bottom: 12),
-                child: InkWell(
-                  onTap: () => _selectComponent(index),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: selected ? const Color(0xFFF8FCFD) : _pageBg,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: selected ? _tealDark : _border,
-                        width: selected ? 1.5 : 0.5,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        ReorderableDragStartListener(
-                          index: index,
-                          child: Icon(Icons.drag_indicator, color: _bodyText),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                component.label,
-                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: _headingText),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                component.type,
-                                style: const TextStyle(color: _bodyText, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        _CategoryChip(label: component.category),
-                        const SizedBox(width: 8),
-                        if (_canEdit)
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _components.removeAt(index);
-                                if (_components.isEmpty) {
-                                  _components.add(TemplateComponent.empty());
-                                  _selectedIndex = 0;
-                                } else {
-                                  _selectedIndex = _selectedIndex.clamp(0, _components.length - 1);
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.delete_outline, size: 18, color: _bodyText),
-                          ),
-                      ],
-                    ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: isWeb
+                ? const _WebSectionHeading(
+                    title: 'Components',
+                    subtitle: 'Drag to reorder. Select a card to edit its properties.',
+                  )
+                : const SectionHeader(
+                    title: 'Components',
+                    subtitle: 'Drag to reorder. Select a card to edit its properties.',
                   ),
-                ),
-              );
-            },
+          ),
+          if (isWeb) ...[
+            Divider(height: 1, color: _border),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: SpacingTokens.md,
+              ),
+              color: _mintChipBg.withValues(alpha: 0.4),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _columnLabel('COMPONENT'),
+                  ),
+                  Expanded(child: _columnLabel('CATEGORY')),
+                  const SizedBox(width: 40),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: _border),
+          ],
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              isWeb ? 0 : 20,
+              isWeb ? 0 : 0,
+              isWeb ? 0 : 20,
+              20,
+            ),
+            child: ReorderableListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _components.length,
+              buildDefaultDragHandles: false,
+              onReorder: (oldIndex, newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final item = _components.removeAt(oldIndex);
+                  _components.insert(newIndex, item);
+                  _selectedIndex = newIndex;
+                });
+              },
+              itemBuilder: (context, index) {
+                final component = _components[index];
+                final selected = index == _selectedIndex;
+                return isWeb
+                    ? _WebComponentRow(
+                        key: ValueKey(component.label + index.toString()),
+                        index: index,
+                        component: component,
+                        selected: selected,
+                        canEdit: _canEdit,
+                        onTap: () => _selectComponent(index),
+                        onDelete: () => _removeComponent(index),
+                      )
+                    : Padding(
+                        key: ValueKey(component.label + index.toString()),
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: InkWell(
+                          onTap: () => _selectComponent(index),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: selected ? const Color(0xFFF8FCFD) : _pageBg,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: selected ? _tealDark : _border,
+                                width: selected ? 1.5 : 0.5,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                ReorderableDragStartListener(
+                                  index: index,
+                                  child: Icon(Icons.drag_indicator, color: _bodyText),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        component.label,
+                                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: _headingText),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        component.type,
+                                        style: const TextStyle(color: _bodyText, fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                _CategoryChip(label: component.category),
+                                const SizedBox(width: 8),
+                                if (_canEdit)
+                                  IconButton(
+                                    onPressed: () => _removeComponent(index),
+                                    icon: const Icon(Icons.delete_outline, size: 18, color: _bodyText),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPropertiesPane(BuildContext context) {
+  Widget _columnLabel(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: _bodyText,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  void _removeComponent(int index) {
+    setState(() {
+      _components.removeAt(index);
+      if (_components.isEmpty) {
+        _components.add(TemplateComponent.empty());
+        _selectedIndex = 0;
+      } else {
+        _selectedIndex = _selectedIndex.clamp(0, _components.length - 1);
+      }
+    });
+    _syncControllersWithSelection();
+  }
+
+  Widget _buildPropertiesPane(BuildContext context, {bool isWeb = false}) {
     final component = _selectedComponent;
     final showChoices = _isChoiceType(component.type);
     final showScaleValues = _isLikertType(component.type);
@@ -374,29 +693,35 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: _cardWhite,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border),
+        borderRadius: BorderRadius.circular(isWeb ? 18 : 20),
+        border: Border.all(color: _border, width: isWeb ? 0.5 : 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: isWeb ? 0.03 : 0.04),
+            blurRadius: isWeb ? 14 : 18,
+            offset: Offset(0, isWeb ? 6 : 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader(
-            title: 'Properties',
-            subtitle: 'Mock editing panel for questionnaire components.',
-          ),
+          isWeb
+              ? const _WebSectionHeading(
+                  title: 'Properties',
+                  subtitle: 'Mock editing panel for questionnaire components.',
+                )
+              : const SectionHeader(
+                  title: 'Properties',
+                  subtitle: 'Mock editing panel for questionnaire components.',
+                ),
           const SizedBox(height: 16),
           TextField(
             decoration: const InputDecoration(
               labelText: 'Label',
               prefixIcon: Icon(Icons.label_outline, size: 20),
             ),
+            style: isWeb ? GoogleFonts.inter(fontSize: 14) : null,
             controller: _labelController,
             readOnly: !_canEdit,
             onChanged: _canEdit
@@ -410,6 +735,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
               prefixIcon: Icon(Icons.description_outlined, size: 20),
               alignLabelWithHint: true,
             ),
+            style: isWeb ? GoogleFonts.inter(fontSize: 14) : null,
             controller: _descriptionController,
             maxLines: 2,
             readOnly: !_canEdit,
@@ -420,7 +746,12 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           const SizedBox(height: 4),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Required'),
+            title: Text(
+              'Required',
+              style: isWeb
+                  ? GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: _headingText)
+                  : null,
+            ),
             value: component.isRequired,
             activeThumbColor: _tealDark,
             onChanged: _canEdit
@@ -429,7 +760,12 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ),
           if (showChoices) ...[
             const SizedBox(height: 12),
-            const Text('Choices', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: _headingText)),
+            Text(
+              'Choices',
+              style: isWeb
+                  ? GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: _headingText)
+                  : const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: _headingText),
+            ),
             const SizedBox(height: 8),
             if (component.choices.isEmpty)
               Text(
@@ -472,6 +808,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                 labelText: 'Scale Values',
                 prefixIcon: Icon(Icons.tune_outlined, size: 20),
               ),
+              style: isWeb ? GoogleFonts.inter(fontSize: 14) : null,
               controller: _scaleValuesController,
               readOnly: !_canEdit,
               onChanged: _canEdit
@@ -494,6 +831,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                 labelText: 'Placeholder',
                 prefixIcon: Icon(Icons.text_fields_outlined, size: 20),
               ),
+              style: isWeb ? GoogleFonts.inter(fontSize: 14) : null,
               controller: _placeholderController,
               readOnly: !_canEdit,
               onChanged: _canEdit
@@ -503,9 +841,9 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
           ],
           if (!showChoices && !showScaleValues && !showPlaceholder) ...[
             const SizedBox(height: 12),
-            Text(
+            const Text(
               'This component has no additional configuration fields.',
-              style: const TextStyle(color: _bodyText, fontSize: 13),
+              style: TextStyle(color: _bodyText, fontSize: 13),
             ),
           ],
         ],
@@ -695,6 +1033,289 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB-STYLE SECTION HEADING — mirrors card headings used across the web app
+// ═══════════════════════════════════════════════════════════════════════════
+class _WebSectionHeading extends StatelessWidget {
+  const _WebSectionHeading({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: _TemplateBuilderPageState._headingText,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: GoogleFonts.inter(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
+            color: _TemplateBuilderPageState._bodyText,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB STATS ROW — same card pattern as _WebSurveysStatsRow in SurveysPage
+// ═══════════════════════════════════════════════════════════════════════════
+class _WebTemplateStatsRow extends StatelessWidget {
+  const _WebTemplateStatsRow({
+    required this.totalComponents,
+    required this.requiredCount,
+    required this.categoryCount,
+    required this.styleLabel,
+  });
+
+  final int totalComponents;
+  final int requiredCount;
+  final int categoryCount;
+  final String styleLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      _WebTemplateStat(
+        label: 'Components',
+        value: totalComponents.toString(),
+        icon: Icons.widgets_outlined,
+        iconBg: _TemplateBuilderPageState._mintChipBg,
+        iconColor: _TemplateBuilderPageState._iconTeal,
+      ),
+      _WebTemplateStat(
+        label: 'Required Fields',
+        value: requiredCount.toString(),
+        icon: Icons.check_circle_outline,
+        iconBg: _TemplateBuilderPageState._successGreen.withValues(alpha: 0.12),
+        iconColor: _TemplateBuilderPageState._successGreen,
+      ),
+      _WebTemplateStat(
+        label: 'Categories Used',
+        value: categoryCount.toString(),
+        icon: Icons.category_outlined,
+        iconBg: _TemplateBuilderPageState._infoBlue.withValues(alpha: 0.12),
+        iconColor: _TemplateBuilderPageState._infoBlue,
+      ),
+      _WebTemplateStat(
+        label: 'Layout Style',
+        value: styleLabel,
+        icon: Icons.dashboard_customize_outlined,
+        iconBg: _TemplateBuilderPageState._tealDark.withValues(alpha: 0.12),
+        iconColor: _TemplateBuilderPageState._tealDark,
+      ),
+    ];
+
+    return Row(
+      children: stats.asMap().entries.map((entry) {
+        final isLast = entry.key == stats.length - 1;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : SpacingTokens.lg),
+            child: _WebTemplateStatCard(stat: entry.value),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _WebTemplateStat {
+  const _WebTemplateStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+}
+
+class _WebTemplateStatCard extends StatelessWidget {
+  const _WebTemplateStatCard({required this.stat});
+
+  final _WebTemplateStat stat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(SpacingTokens.lg),
+      decoration: BoxDecoration(
+        color: _TemplateBuilderPageState._cardWhite,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _TemplateBuilderPageState._border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: stat.iconBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(stat.icon, color: stat.iconColor, size: 22),
+          ),
+          const SizedBox(width: SpacingTokens.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  stat.label,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: _TemplateBuilderPageState._bodyText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  stat.value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: _TemplateBuilderPageState._headingText,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB COMPONENT ROW — table-row styled item, echoing _WebSurveyRow
+// ═══════════════════════════════════════════════════════════════════════════
+class _WebComponentRow extends StatelessWidget {
+  const _WebComponentRow({
+    super.key,
+    required this.index,
+    required this.component,
+    required this.selected,
+    required this.canEdit,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  final int index;
+  final TemplateComponent component;
+  final bool selected;
+  final bool canEdit;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected
+          ? _TemplateBuilderPageState._mintChipBg.withValues(alpha: 0.5)
+          : Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: _TemplateBuilderPageState._border),
+              left: BorderSide(
+                color: selected ? _TemplateBuilderPageState._tealDark : Colors.transparent,
+                width: 3,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              ReorderableDragStartListener(
+                index: index,
+                child: Icon(
+                  Icons.drag_indicator,
+                  size: 18,
+                  color: _TemplateBuilderPageState._bodyText,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      component.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: _TemplateBuilderPageState._headingText,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      component.type,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: _TemplateBuilderPageState._bodyText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: _CategoryChip(label: component.category),
+              ),
+              SizedBox(
+                width: 40,
+                child: canEdit
+                    ? IconButton(
+                        onPressed: onDelete,
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        color: _TemplateBuilderPageState._bodyText,
+                        tooltip: 'Remove',
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _StyleOptionCard extends StatelessWidget {
   const _StyleOptionCard({
     required this.title,
@@ -774,6 +1395,8 @@ class _CategoryChip extends StatelessWidget {
       ),
       child: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           color: _iconTeal,
           fontSize: 11,

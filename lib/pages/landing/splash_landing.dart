@@ -154,7 +154,7 @@ class _SplashLandingState extends State<SplashLanding>
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.85),
+                        color: Colors.white.withOpacity(0.85),
                       ),
                     ),
                   ),
@@ -175,7 +175,7 @@ class _SplashLandingState extends State<SplashLanding>
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
                             valueColor: AlwaysStoppedAnimation(
-                              Colors.white.withValues(alpha: 0.9),
+                              Colors.white.withOpacity(0.9),
                             ),
                           ),
                         ),
@@ -184,7 +184,7 @@ class _SplashLandingState extends State<SplashLanding>
                           'Loading...',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                             fontWeight: FontWeight.w500,
                           ),
                         ),

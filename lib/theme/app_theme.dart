@@ -429,6 +429,7 @@ extension AppThemeContext on BuildContext {
           : AppThemeData.light);
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
   Color get surface => appTheme.surface;
+  Color get surfaceContainerLowest => appTheme.surfaceContainer;
   Color get surfaceContainer => appTheme.surfaceContainer;
   Color get surfaceContainerHigh => appTheme.surfaceContainerHigh;
   Color get surfaceContainerHighest => appTheme.surfaceContainerHighest;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'pages/landing/splash_landing.dart';
-import 'theme/app_theme.dart';
-import 'state/app_state.dart';
+import 'package:capstone_prototype/pages/landing/splash_landing.dart';
+import 'package:capstone_prototype/theme/app_theme.dart';
+import 'package:capstone_prototype/state/app_state.dart';
 
-import 'services/firebase_analytics_service.dart';
+import 'package:capstone_prototype/services/firebase_analytics_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

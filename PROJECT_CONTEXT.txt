@@ -1,0 +1,123 @@
+PROJECT_CONTEXT
+
+==================================================
+1. PROJECT OVERVIEW
+==================================================
+The application is a Flutter project named "TalaanScan". It appears to be an OMR (Optical Mark Recognition) scanning and survey management tool, given the presence of `camera`, `pdf`, `csv`, `excel` dependencies, and pages like `scanner`, `surveys`, `templates`, and `analytics`.
+
+==================================================
+2. TECHNOLOGY STACK
+==================================================
+- Framework: Flutter
+- Language: Dart
+- State Management: Custom InheritedNotifier/ChangeNotifier (`AppStateScope`)
+- Database/Backend: Firebase (Firestore, Auth)
+
+==================================================
+3. PUBSPEC.YAML ANALYSIS
+==================================================
+Dependencies include:
+- `flutter`, `google_fonts`, `cupertino_icons` for UI and styling.
+- `camera`, `file_picker`, `image_picker` for media and document capture.
+- `pdf`, `printing`, `csv`, `excel` for exporting survey/OMR results.
+- `firebase_core`, `cloud_firestore`, `firebase_auth` for backend integration and authentication.
+- `path`, `universal_html` for web/platform compatibility.
+
+==================================================
+4. PROJECT STRUCTURE
+==================================================
+The `lib` directory is structured by feature/layer:
+- `main.dart`
+- `mock/`
+- `models/`
+- `pages/` (Feature directories: `analytics/`, `auth/`, `conversion/`, `dashboard/`, `landing/`, `online_forms/`, `scanner/`, `settings/`, `surveys/`, `templates/`)
+- `services/`
+- `state/`
+- `theme/`
+- `widgets/`
+
+==================================================
+5. CURRENT ARCHITECTURE
+==================================================
+The application uses a Hybrid (Feature-first combined with Layered) architecture.
+- Presentation: Inside `pages/` and `widgets/`
+- Business/State: `state/` (e.g. `AppState`)
+- Services: `services/` (e.g. `FirebaseAnalyticsService`)
+- Models: `models/`
+- Data: Mock data currently resides in `mock/`
+
+==================================================
+6. ARCHITECTURE DIAGRAM
+==================================================
+Application
+├── Presentation (Pages & Widgets)
+│   ├── Auth
+│   ├── Dashboard
+│   ├── Scanner
+│   ├── Surveys
+│   └── Analytics
+├── State (AppStateScope)
+├── Services (Firebase, etc.)
+├── Models
+└── Mock Data
+
+==================================================
+7. NAVIGATION AND ROUTING
+==================================================
+[INFERRED] Navigation is likely simple `Navigator.push` / `Navigator.pushReplacement` given the `home: const SplashLanding()` in `main.dart`, or a basic router.
+
+==================================================
+8. AUTHENTICATION FLOW
+==================================================
+- UI exists under `pages/auth/`.
+- `firebase_auth` is included, so there is likely a login/registration flow intended.
+
+==================================================
+9. UI/UX DESIGN SYSTEM
+==================================================
+[INFERRED] Material Design is primarily used with custom theming in `theme/app_theme.dart`.
+Fonts: Google Fonts are used.
+Colors: Handled centrally in `app_theme.dart`.
+
+==================================================
+10-15. DETAILED INVENTORY
+==================================================
+[INFERRED]
+- Mobile-first layouts based on camera functionality.
+- Reusable widgets likely include standard AppButtons and TextFields in `widgets/`.
+- Mock data in `mock/` acts as a placeholder for Firestore.
+
+==================================================
+16. CURRENT VS EXPECTED REAL BEHAVIOR
+==================================================
+- [IMPLEMENTED] UI components, routing, theme.
+- [MOCKED] Survey data, scanner results.
+- [IMPLIED FUTURE FUNCTIONALITY] Real Firebase integration for Auth, Firestore CRUD, and camera-based OMR processing.
+
+==================================================
+17. RESPONSIVE DESIGN ANALYSIS
+==================================================
+[INFERRED] Currently highly mobile-optimized. Web/Desktop requires adaptive layouts for sidebars instead of bottom navigation.
+
+==================================================
+18-26. RECOMMENDATIONS & ROADMAP
+==================================================
+- Implement a `ResponsiveShell` with `LayoutBuilder`.
+- Use Sidebars on Desktop and BottomNavigationBar on Mobile.
+- Transition `mock/` data to `services/` using real Firebase connections.
+
+==================================================
+AI AGENT HANDOFF CONTEXT
+==================================================
+- What the application is: TalaanScan, a Flutter app for OMR scanning and survey data management.
+- What the current architecture is: Feature/Layer Hybrid with a custom `AppState`.
+- What is currently implemented: Basic routing, theme, and mostly mobile layouts.
+- What is currently mocked: Core data models in `mock/`.
+- What must not be broken: Existing `pages/` routing and state structure.
+- What the mobile design should preserve: Camera-first, compact UI.
+- What the web/desktop design should become: Expanded SaaS-like dashboard.
+- How responsive layouts should work: Using `LayoutBuilder` / `ResponsiveShell`.
+- Which logic should remain shared: Services, State, Models.
+- Which layouts should be platform/breakpoint-specific: Dashboard navigation and scanning UI.
+- How the OMR scanner should behave on mobile versus web: Mobile uses camera; Web uses file upload.
+- How future real backend functionality should replace static data: Hooking Firebase Services to `AppState` instead of Mock models.

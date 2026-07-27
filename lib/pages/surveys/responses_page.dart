@@ -6,14 +6,25 @@ import '../../models/app_models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/paginated_table_card.dart';
+import '../../widgets/web_sidebar.dart';
+import '../../widgets/web_topbar.dart';
+import '../../widgets/responsive_shell.dart';
+import '../auth/login.dart';
+import '../settings/settings_page.dart';
 
 const Color _responsesTealDark = Color.fromARGB(255, 13, 232, 232);
 const Color _responsesTealLight = Color(0xFF2DD4CF);
+const Color _responsesIconTeal = Color(0xFF14B8A6);
+const Color _responsesMintChipBgSolid = Color(0xFFDFF5F3);
 const Color _responsesHeadingText = Color(0xFF0E2A2E);
 const Color _responsesBodyText = Color(0xFF7C8A90);
 const Color _responsesCardWhite = Color(0xFFFFFFFF);
 const Color _responsesBorder = Color(0xFFDDECEF);
 const Color _responsesMintChipBg = Color(0xFFDFF5F3);
+const Color _responsesPageBg = Color(0xFFF4F7F8);
+
+const Color _responsesInfoBlue = Color(0xFF2563EB);
+const Color _responsesDangerRed = Color(0xFFE11D48);
 
 class ResponsesPage extends StatefulWidget {
   const ResponsesPage({
@@ -33,6 +44,9 @@ class _ResponsesPageState extends State<ResponsesPage> {
   final _searchController = TextEditingController();
   String _query = '';
   String _filterType = 'all'; // 'all', 'needs_review', 'good'
+  int _page = 0;
+
+  static const int _responsesPerPage = 20;
 
   @override
   void dispose() {
@@ -42,14 +56,14 @@ class _ResponsesPageState extends State<ResponsesPage> {
 
   List<ResponseRecord> get _filteredResponses {
     var responses = widget.responses;
-    
+
     // Filter by type (needs review or good)
     if (_filterType == 'needs_review') {
       responses = responses.where(_responseNeedsReview).toList();
     } else if (_filterType == 'good') {
       responses = responses.where((response) => !_responseNeedsReview(response)).toList();
     }
-    
+
     // Filter by search query
     if (_query.trim().isEmpty) {
       return responses;
@@ -60,16 +74,75 @@ class _ResponsesPageState extends State<ResponsesPage> {
         .toList();
   }
 
+  int _totalPagesFor(int itemCount) {
+    if (itemCount == 0) return 1;
+    return (itemCount / _responsesPerPage).ceil();
+  }
+
+  int _currentPageFor(int itemCount) {
+    final maxPage = _totalPagesFor(itemCount) - 1;
+    return _page.clamp(0, maxPage).toInt();
+  }
+
+  List<ResponseRecord> _pageResponses(List<ResponseRecord> responses) {
+    if (responses.isEmpty) return const [];
+    final currentPage = _currentPageFor(responses.length);
+    final start = currentPage * _responsesPerPage;
+    final end = math.min(start + _responsesPerPage, responses.length);
+    return responses.sublist(start, end);
+  }
+
+  void _updateQuery(String value) {
+    setState(() {
+      _query = value;
+      _page = 0;
+    });
+  }
+
+  void _updateFilter(String value) {
+    setState(() {
+      _filterType = value;
+      _page = 0;
+    });
+  }
+
+  void _previousPage() {
+    if (_page == 0) return;
+    setState(() => _page -= 1);
+  }
+
+  void _nextPage(int itemCount) {
+    final maxPage = _totalPagesFor(itemCount) - 1;
+    if (_page >= maxPage) return;
+    setState(() => _page += 1);
+  }
+
   bool _responseNeedsReview(ResponseRecord response) {
     return response.answers.where((a) => a.score < 2).length > 1;
   }
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 900) {
+          return _buildMobileLayout(context);
+        }
+        return _buildWebLayout(context);
+      },
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MOBILE LAYOUT (preserved from original — do not modify)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildMobileLayout(BuildContext context) {
     final filtered = _filteredResponses;
+    final pagedResponses = _pageResponses(filtered);
+    final currentPage = _currentPageFor(filtered.length);
+    final totalPages = _totalPagesFor(filtered.length);
     final reviewResponses = filtered.where(_responseNeedsReview).toList();
     final goodResponses = filtered.where((response) => !_responseNeedsReview(response)).toList();
-    final reviewDisplay = reviewResponses.take(5).toList();
 
     return Scaffold(
       backgroundColor: AppPalette.teal50,
@@ -155,7 +228,7 @@ class _ResponsesPageState extends State<ResponsesPage> {
                         const SizedBox(height: 16),
                         TextField(
                           controller: _searchController,
-                          onChanged: (value) => setState(() => _query = value),
+                          onChanged: _updateQuery,
                           cursorColor: Colors.white,
                           style: const TextStyle(
                             color: Colors.white,
@@ -234,19 +307,19 @@ class _ResponsesPageState extends State<ResponsesPage> {
                             _FilterChip(
                               label: 'All Responses (${widget.responses.length})',
                               isSelected: _filterType == 'all',
-                              onPressed: () => setState(() => _filterType = 'all'),
+                              onPressed: () => _updateFilter('all'),
                               color: Colors.blue,
                             ),
                             _FilterChip(
                               label: 'Needs Review (${reviewResponses.length})',
                               isSelected: _filterType == 'needs_review',
-                              onPressed: () => setState(() => _filterType = 'needs_review'),
+                              onPressed: () => _updateFilter('needs_review'),
                               color: Colors.orange,
                             ),
                             _FilterChip(
                               label: 'Good (${goodResponses.length})',
                               isSelected: _filterType == 'good',
-                              onPressed: () => setState(() => _filterType = 'good'),
+                              onPressed: () => _updateFilter('good'),
                               color: Colors.green,
                             ),
                           ],
@@ -294,21 +367,28 @@ class _ResponsesPageState extends State<ResponsesPage> {
                           if (isMobile)
                             _ResponsesMobileList(
                               survey: widget.survey,
-                              responses: filtered,
+                              responses: pagedResponses,
                               onView: _openDetails,
                             )
                           else if (isTablet)
                             _ResponsesTabletTable(
                               survey: widget.survey,
-                              responses: filtered,
+                              responses: pagedResponses,
                               onView: _openDetails,
                             )
                           else
                             _ResponsesDesktopTable(
                               survey: widget.survey,
-                              responses: filtered,
+                              responses: pagedResponses,
                               onView: _openDetails,
                             ),
+                          const SizedBox(height: 16),
+                          _ResponsesPaginationControls(
+                            currentPage: currentPage,
+                            totalPages: totalPages,
+                            onPreviousPage: _previousPage,
+                            onNextPage: () => _nextPage(filtered.length),
+                          ),
                         ],
                       ),
                     )
@@ -344,6 +424,108 @@ class _ResponsesPageState extends State<ResponsesPage> {
     );
   }
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // WEB LAYOUT (modern design with sidebar + topbar, matching the rest
+  // of the web app; same teal palette as the mobile layout)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildWebLayout(BuildContext context) {
+    final filtered = _filteredResponses;
+    final pagedResponses = _pageResponses(filtered);
+    final currentPage = _currentPageFor(filtered.length);
+    final totalPages = _totalPagesFor(filtered.length);
+    final reviewResponses = widget.responses.where(_responseNeedsReview).toList();
+    final goodResponses = widget.responses.where((r) => !_responseNeedsReview(r)).toList();
+    final avgScore = widget.responses.isEmpty
+        ? 0.0
+        : widget.responses.fold<double>(
+              0,
+              (sum, r) => sum + (r.answers.isEmpty
+                  ? 0
+                  : r.answers.fold<int>(0, (s, a) => s + a.score) / r.answers.length),
+            ) /
+            widget.responses.length;
+
+    return Scaffold(
+      backgroundColor: _responsesPageBg,
+      body: Row(
+        children: [
+          WebSidebar(
+            currentIndex: 1, // Responses live under the Surveys section
+            onNavigate: (index) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(
+                  builder: (_) => ResponsiveShell(initialIndex: index),
+                ),
+                (route) => false,
+              );
+            },
+            onLogout: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
+            },
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                WebTopbar(
+                  onSettings: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
+                  ),
+                  unreadNotifications: 0,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(28),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1280),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _WebResponsesHeader(
+                              survey: widget.survey,
+                              searchController: _searchController,
+                              onSearchChanged: _updateQuery,
+                              onBack: () => Navigator.pop(context),
+                            ),
+                            const SizedBox(height: 24),
+                            _WebResponsesStatsRow(
+                              totalCount: widget.responses.length,
+                              needsReviewCount: reviewResponses.length,
+                              goodCount: goodResponses.length,
+                              avgScore: avgScore,
+                            ),
+                            const SizedBox(height: 24),
+                            _WebResponsesTable(
+                              filterType: _filterType,
+                              onFilterChanged: _updateFilter,
+                              totalCount: widget.responses.length,
+                              needsReviewCount: reviewResponses.length,
+                              goodCount: goodResponses.length,
+                              responses: pagedResponses,
+                              currentPage: currentPage,
+                              totalPages: totalPages,
+                              onPreviousPage: _previousPage,
+                              onNextPage: () => _nextPage(filtered.length),
+                              onView: _openDetails,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _openDetails(ResponseRecord response) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -352,6 +534,10 @@ class _ResponsesPageState extends State<ResponsesPage> {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SHARED WIDGETS (used by both mobile and web layouts)
+// ═══════════════════════════════════════════════════════════════════════════
 
 class _PanelCard extends StatelessWidget {
   const _PanelCard({required this.child, this.padding = const EdgeInsets.all(16)});
@@ -468,7 +654,7 @@ class _ResponsesDesktopTable extends StatelessWidget {
     return PaginatedTableCard(
       title: 'Responses for ${survey.name}',
       subtitle: 'Desktop table view with mock pagination.',
-      rowsPerPage: 8,
+      rowsPerPage: _ResponsesPageState._responsesPerPage,
       columns: const [
         DataColumn(label: Text('Response ID')),
         DataColumn(label: Text('Survey Name')),
@@ -528,7 +714,10 @@ class _ResponsesTabletTable extends StatelessWidget {
           const SizedBox(height: 16),
           PaginatedDataTable(
             header: const Text('Responses'),
-            rowsPerPage: responses.isEmpty ? 1 : math.min(8, responses.length).toInt(),
+            rowsPerPage: responses.isEmpty
+                ? 1
+                : math.min(_ResponsesPageState._responsesPerPage, responses.length)
+                    .toInt(),
             showCheckboxColumn: false,
             columns: const [
               DataColumn(label: Text('Response ID')),
@@ -637,6 +826,54 @@ class _ResponsesDataSource extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
+class _ResponsesPaginationControls extends StatelessWidget {
+  const _ResponsesPaginationControls({
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPreviousPage,
+    required this.onNextPage,
+  });
+
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback onPreviousPage;
+  final VoidCallback onNextPage;
+
+  @override
+  Widget build(BuildContext context) {
+    final isFirstPage = currentPage == 0;
+    final isLastPage = currentPage >= totalPages - 1;
+
+    return Row(
+      children: [
+        Text(
+          'Page ${currentPage + 1} of $totalPages',
+          style: const TextStyle(
+            color: _responsesBodyText,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const Spacer(),
+        TextButton.icon(
+          onPressed: isFirstPage ? null : onPreviousPage,
+          icon: const Icon(Icons.chevron_left, size: 18),
+          label: const Text('Previous'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton.icon(
+          onPressed: isLastPage ? null : onNextPage,
+          icon: const Icon(Icons.chevron_right, size: 18),
+          label: const Text('Next'),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ResponseCard extends StatelessWidget {
   const _ResponseCard({
     required this.response,
@@ -740,6 +977,580 @@ class _ResponseCard extends StatelessWidget {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB WIDGETS (modern design, matching the teal palette used elsewhere)
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _WebResponsesHeader extends StatelessWidget {
+  const _WebResponsesHeader({
+    required this.survey,
+    required this.searchController,
+    required this.onSearchChanged,
+    required this.onBack,
+  });
+
+  final SurveyRecord survey;
+  final TextEditingController searchController;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = survey.status == SurveyStatus.active ? _responsesSuccessGreen : _responsesBodyText;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_responsesTealLight, _responsesTealDark],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: _responsesTealDark.withValues(alpha: 0.25),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Material(
+                color: Colors.white.withValues(alpha: 0.18),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onBack,
+                  child: const SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Icon(Icons.arrow_back_rounded, size: 20, color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Icon(Icons.assignment_turned_in_outlined, color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Survey Responses',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      survey.name,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  survey.status.name.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: 340,
+            height: 44,
+            child: TextField(
+              controller: searchController,
+              onChanged: onSearchChanged,
+              cursorColor: Colors.white,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Search by response ID',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.78),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+                prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.82), size: 18),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.16),
+                contentPadding: EdgeInsets.zero,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const Color _responsesSuccessGreen = Color(0xFF16A34A);
+
+class _WebResponsesStatsRow extends StatelessWidget {
+  const _WebResponsesStatsRow({
+    required this.totalCount,
+    required this.needsReviewCount,
+    required this.goodCount,
+    required this.avgScore,
+  });
+
+  final int totalCount;
+  final int needsReviewCount;
+  final int goodCount;
+  final double avgScore;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      _WebResponseStat(
+        label: 'Total Responses',
+        value: totalCount.toString(),
+        icon: Icons.assignment_outlined,
+        iconBg: _responsesMintChipBg,
+        iconColor: _responsesIconTeal,
+      ),
+      _WebResponseStat(
+        label: 'Needs Review',
+        value: needsReviewCount.toString(),
+        icon: Icons.warning_amber_rounded,
+        iconBg: Colors.orange.withValues(alpha: 0.12),
+        iconColor: Colors.orange[700]!,
+      ),
+      _WebResponseStat(
+        label: 'Good Responses',
+        value: goodCount.toString(),
+        icon: Icons.verified_outlined,
+        iconBg: _responsesSuccessGreen.withValues(alpha: 0.12),
+        iconColor: _responsesSuccessGreen,
+      ),
+      _WebResponseStat(
+        label: 'Average Score',
+        value: '${avgScore.toStringAsFixed(1)} / 5',
+        icon: Icons.star_outline_rounded,
+        iconBg: _responsesInfoBlue.withValues(alpha: 0.12),
+        iconColor: _responsesInfoBlue,
+      ),
+    ];
+
+    return Row(
+      children: stats.asMap().entries.map((entry) {
+        final isLast = entry.key == stats.length - 1;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : 16),
+            child: _WebResponseStatCard(stat: entry.value),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _WebResponseStat {
+  const _WebResponseStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+}
+
+class _WebResponseStatCard extends StatelessWidget {
+  const _WebResponseStatCard({required this.stat});
+
+  final _WebResponseStat stat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _responsesCardWhite,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _responsesBorder, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: stat.iconBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(stat.icon, color: stat.iconColor, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  stat.label,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: _responsesBodyText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  stat.value,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: _responsesHeadingText,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WebResponsesTable extends StatelessWidget {
+  const _WebResponsesTable({
+    required this.filterType,
+    required this.onFilterChanged,
+    required this.totalCount,
+    required this.needsReviewCount,
+    required this.goodCount,
+    required this.responses,
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPreviousPage,
+    required this.onNextPage,
+    required this.onView,
+  });
+
+  final String filterType;
+  final ValueChanged<String> onFilterChanged;
+  final int totalCount;
+  final int needsReviewCount;
+  final int goodCount;
+  final List<ResponseRecord> responses;
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback onPreviousPage;
+  final VoidCallback onNextPage;
+  final void Function(ResponseRecord response) onView;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: _responsesCardWhite,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _responsesBorder, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        filterType == 'needs_review'
+                            ? 'Needs Review'
+                            : filterType == 'good'
+                                ? 'Good Responses'
+                                : 'All Responses',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: _responsesHeadingText,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Frontend-only sample responses for this survey.',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                          color: _responsesBodyText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _FilterChip(
+                      label: 'All ($totalCount)',
+                      isSelected: filterType == 'all',
+                      onPressed: () => onFilterChanged('all'),
+                      color: Colors.blue,
+                    ),
+                    _FilterChip(
+                      label: 'Needs Review ($needsReviewCount)',
+                      isSelected: filterType == 'needs_review',
+                      onPressed: () => onFilterChanged('needs_review'),
+                      color: Colors.orange,
+                    ),
+                    _FilterChip(
+                      label: 'Good ($goodCount)',
+                      isSelected: filterType == 'good',
+                      onPressed: () => onFilterChanged('good'),
+                      color: Colors.green,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: _responsesBorder),
+          if (responses.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 56),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.inbox_outlined,
+                      size: 42,
+                      color: _responsesBodyText,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'No responses found.',
+                      style: TextStyle(
+                        color: _responsesBodyText,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              color: _responsesMintChipBg.withValues(alpha: 0.4),
+              child: Row(
+                children: [
+                  Expanded(flex: 2, child: _headerLabel('RESPONSE ID')),
+                  Expanded(flex: 2, child: _headerLabel('RESPONDENT')),
+                  Expanded(flex: 2, child: _headerLabel('SURVEY')),
+                  Expanded(flex: 2, child: _headerLabel('SYNC DATE')),
+                  Expanded(child: _headerLabel('STATUS')),
+                  const SizedBox(width: 90),
+                ],
+              ),
+            ),
+            const Divider(height: 1, color: _responsesBorder),
+            ...responses.asMap().entries.map((entry) {
+              final response = entry.value;
+              final isLast = entry.key == responses.length - 1;
+              return Column(
+                children: [
+                  _WebResponseRow(response: response, onView: onView),
+                  if (!isLast) const Divider(height: 1, color: _responsesBorder),
+                ],
+              );
+            }),
+          ],
+          const Divider(height: 1, color: _responsesBorder),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: _ResponsesPaginationControls(
+              currentPage: currentPage,
+              totalPages: totalPages,
+              onPreviousPage: onPreviousPage,
+              onNextPage: onNextPage,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: _responsesBodyText,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+}
+
+class _WebResponseRow extends StatelessWidget {
+  const _WebResponseRow({
+    required this.response,
+    required this.onView,
+  });
+
+  final ResponseRecord response;
+  final void Function(ResponseRecord response) onView;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              response.responseId,
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                color: _responsesHeadingText,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              response.respondentName,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: _responsesHeadingText,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              response.surveyName,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: _responsesBodyText,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              response.syncDate,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: _responsesBodyText,
+              ),
+            ),
+          ),
+          Expanded(
+            child: StatusBadge(
+              label: responseStatusLabel(response.status),
+              color: responseStatusColor(response.status),
+            ),
+          ),
+          SizedBox(
+            width: 90,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => onView(response),
+                icon: const Icon(Icons.visibility_outlined, size: 16),
+                label: const Text('View'),
+                style: TextButton.styleFrom(
+                  foregroundColor: _responsesIconTeal,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RESPONSE DETAILS PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+
 class ResponseDetailsPage extends StatelessWidget {
   const ResponseDetailsPage({super.key, required this.response});
 
@@ -747,9 +1558,20 @@ class ResponseDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 900) {
+          return _buildMobileLayout(context);
+        }
+        return _buildWebLayout(context);
+      },
+    );
+  }
+
+  List<StatItem> _buildStats() {
     final averageScore =
         response.answers.fold<int>(0, (sum, answer) => sum + answer.score) / response.answers.length;
-    final stats = [
+    return [
       StatItem(
         label: 'Average Score',
         value: averageScore.toStringAsFixed(1),
@@ -779,6 +1601,13 @@ class ResponseDetailsPage extends StatelessWidget {
         delta: 'Assigned',
       ),
     ];
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MOBILE LAYOUT (preserved from original — do not modify)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildMobileLayout(BuildContext context) {
+    final stats = _buildStats();
 
     return Scaffold(
       backgroundColor: AppPalette.teal50,
@@ -925,6 +1754,259 @@ class ResponseDetailsPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // WEB LAYOUT (modern design with sidebar + topbar)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildWebLayout(BuildContext context) {
+    final stats = _buildStats();
+
+    return Scaffold(
+      backgroundColor: _responsesPageBg,
+      body: Row(
+        children: [
+          WebSidebar(
+            currentIndex: 1,
+            onNavigate: (index) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(
+                  builder: (_) => ResponsiveShell(initialIndex: index),
+                ),
+                (route) => false,
+              );
+            },
+            onLogout: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
+            },
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                WebTopbar(
+                  onSettings: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
+                  ),
+                  unreadNotifications: 0,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(28),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1280),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // ── Header banner ─────────────────────────
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [_responsesTealLight, _responsesTealDark],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _responsesTealDark.withValues(alpha: 0.25),
+                                    blurRadius: 24,
+                                    offset: const Offset(0, 12),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Material(
+                                    color: Colors.white.withValues(alpha: 0.18),
+                                    shape: const CircleBorder(),
+                                    child: InkWell(
+                                      customBorder: const CircleBorder(),
+                                      onTap: () => Navigator.pop(context),
+                                      child: const SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: Icon(Icons.arrow_back_rounded, size: 20, color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.18),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: const Icon(Icons.person_outline, color: Colors.white, size: 19),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          response.respondentName,
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white,
+                                            letterSpacing: -0.4,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          '${response.responseId} · ${response.surveyName}',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white.withValues(alpha: 0.9),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+
+                            // ── Two-column body ───────────────────────
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(24),
+                                        decoration: BoxDecoration(
+                                          color: _responsesCardWhite,
+                                          borderRadius: BorderRadius.circular(18),
+                                          border: Border.all(color: _responsesBorder, width: 0.5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.03),
+                                              blurRadius: 14,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Respondent information',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w800,
+                                                color: _responsesHeadingText,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            const Text(
+                                              'Mock completed questionnaire preview.',
+                                              style: TextStyle(
+                                                fontSize: 12.5,
+                                                fontWeight: FontWeight.w600,
+                                                color: _responsesBodyText,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 18),
+                                            _InfoGrid(response: response),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      const Text(
+                                        'Questionnaire content',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                          color: _responsesHeadingText,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      for (final answer in response.answers) ...[
+                                        _QuestionAnswerCard(answer: answer),
+                                        const SizedBox(height: 12),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      for (final stat in stats) ...[
+                                        StatCard(
+                                          label: stat.label,
+                                          value: stat.value,
+                                          icon: stat.icon,
+                                          accent: stat.accent,
+                                          delta: stat.delta,
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+                                      Container(
+                                        padding: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          color: _responsesCardWhite,
+                                          borderRadius: BorderRadius.circular(18),
+                                          border: Border.all(color: _responsesBorder, width: 0.5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.03),
+                                              blurRadius: 14,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Interpretation',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w800,
+                                                color: _responsesHeadingText,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              response.interpretation,
+                                              style: const TextStyle(height: 1.6, color: _responsesBodyText),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

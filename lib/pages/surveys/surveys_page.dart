@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
@@ -11,6 +12,18 @@ import '../../state/app_state.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import 'deploy_survey_page.dart';
+
+/// Shared helper (used by both the mobile and web layouts) to determine
+/// whether a survey has responses that should be flagged for review.
+bool _surveyHasFlaggedResponses(SurveyRecord survey) {
+  final responses = mock_data.buildMockResponses(survey);
+  final flaggedCount = responses.where((resp) {
+    // Flag responses with 2+ low scores
+    final lowScores = resp.answers.where((a) => a.score < 2).length;
+    return lowScores > 1;
+  }).length;
+  return flaggedCount > 0;
+}
 
 class SurveysPage extends StatefulWidget {
   const SurveysPage({
@@ -34,6 +47,11 @@ class SurveysPage extends StatefulWidget {
 
 class _SurveysPageState extends State<SurveysPage> {
   final _searchController = TextEditingController();
+  String _query = '';
+  SurveyStatus? _statusFilter;
+  int _page = 0;
+
+  static const int _surveysPerPage = 10;
 
   static const Color _tealDark = Color.fromARGB(255, 13, 232, 232);
   static const Color _tealLight = Color(0xFF2DD4CF);
@@ -60,16 +78,111 @@ class _SurveysPageState extends State<SurveysPage> {
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final query = _searchController.text.trim().toLowerCase();
+    final query = _query.trim().toLowerCase();
     final surveys = appState.surveys.where((survey) {
+      if (_statusFilter != null && survey.status != _statusFilter) {
+        return false;
+      }
       if (query.isEmpty) return true;
       return survey.name.toLowerCase().contains(query) ||
           survey.templateUsed.toLowerCase().contains(query) ||
           survey.id.toLowerCase().contains(query);
     }).toList();
+    final totalPages = _totalPages(surveys.length);
+    final currentPage = _currentPage(surveys.length);
+    final pagedSurveys = _pageItems(surveys, currentPage);
 
+    final allSurveys = appState.surveys;
+    final totalCount = allSurveys.length;
+    final activeCount =
+        allSurveys.where((s) => s.status == SurveyStatus.active).length;
+    final totalResponses = allSurveys.fold<int>(
+      0,
+      (sum, s) => sum + s.responses,
+    );
+    final flaggedCount = allSurveys.where(_surveyHasFlaggedResponses).length;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 900) {
+          return _buildMobileLayout(
+            context,
+            surveys: surveys,
+            pagedSurveys: pagedSurveys,
+            currentPage: currentPage,
+            totalPages: totalPages,
+          );
+        }
+        return _buildWebLayout(
+          context,
+          surveys: surveys,
+          pagedSurveys: pagedSurveys,
+          currentPage: currentPage,
+          totalPages: totalPages,
+          totalCount: totalCount,
+          activeCount: activeCount,
+          totalResponses: totalResponses,
+          flaggedCount: flaggedCount,
+        );
+      },
+    );
+  }
+
+  int _totalPages(int itemCount) {
+    if (itemCount == 0) return 1;
+    return (itemCount / _surveysPerPage).ceil();
+  }
+
+  int _currentPage(int itemCount) {
+    final maxPage = _totalPages(itemCount) - 1;
+    return _page.clamp(0, maxPage).toInt();
+  }
+
+  List<SurveyRecord> _pageItems(List<SurveyRecord> surveys, int page) {
+    if (surveys.isEmpty) return const [];
+    final start = page * _surveysPerPage;
+    final end = start + _surveysPerPage > surveys.length
+        ? surveys.length
+        : start + _surveysPerPage;
+    return surveys.sublist(start, end);
+  }
+
+  void _updateQuery(String value) {
+    setState(() {
+      _query = value;
+      _page = 0;
+    });
+  }
+
+  void _updateStatusFilter(SurveyStatus? status) {
+    setState(() {
+      _statusFilter = status;
+      _page = 0;
+    });
+  }
+
+  void _previousPage() {
+    if (_page == 0) return;
+    setState(() => _page -= 1);
+  }
+
+  void _nextPage(int itemCount) {
+    final maxPage = _totalPages(itemCount) - 1;
+    if (_page >= maxPage) return;
+    setState(() => _page += 1);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MOBILE LAYOUT (preserved from original — do not modify)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildMobileLayout(
+    BuildContext context, {
+    required List<SurveyRecord> surveys,
+    required List<SurveyRecord> pagedSurveys,
+    required int currentPage,
+    required int totalPages,
+  }) {
     return Container(
-      
       color: AppPalette.teal50,
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -103,11 +216,13 @@ class _SurveysPageState extends State<SurveysPage> {
                 child: Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: maxWidth),
-                    child: _SurveysHero(
-                      totalCount: appState.surveys.length,
-                      searchController: _searchController,
-                      onSearchChanged: (_) => setState(() {}),
-                      onBack: () {
+                      child: _SurveysHero(
+                        totalCount: surveys.length,
+                        statusFilter: _statusFilter,
+                        searchController: _searchController,
+                        onSearchChanged: _updateQuery,
+                        onStatusFilterChanged: _updateStatusFilter,
+                        onBack: () {
                         if (Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();
                           return;
@@ -135,7 +250,11 @@ class _SurveysPageState extends State<SurveysPage> {
                     child: ConstrainedBox(
                       constraints: BoxConstraints(maxWidth: maxWidth - 24),
                       child: _SurveysPanel(
-                        surveys: surveys,
+                        surveys: pagedSurveys,
+                        currentPage: currentPage,
+                        totalPages: totalPages,
+                        onPreviousPage: _previousPage,
+                        onNextPage: () => _nextPage(surveys.length),
                         onOpenResponses: widget.onOpenResponses,
                         onOpenAnalytics: widget.onOpenAnalytics,
                         onDownloadOmr: (survey) =>
@@ -152,6 +271,80 @@ class _SurveysPageState extends State<SurveysPage> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // WEB LAYOUT (modern design, matching the mobile teal palette)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildWebLayout(
+    BuildContext context, {
+    required List<SurveyRecord> surveys,
+    required List<SurveyRecord> pagedSurveys,
+    required int currentPage,
+    required int totalPages,
+    required int totalCount,
+    required int activeCount,
+    required int totalResponses,
+    required int flaggedCount,
+  }) {
+    return Container(
+      color: _pageBg,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(SpacingTokens.xxl),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1280),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _WebSurveysHeader(
+                  totalCount: totalCount,
+                  searchController: _searchController,
+                  onSearchChanged: _updateQuery,
+                  onNew: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const DeploySurveyPage(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: SpacingTokens.xxl),
+                _WebSurveysStatsRow(
+                  totalCount: totalCount,
+                  activeCount: activeCount,
+                  totalResponses: totalResponses,
+                  flaggedCount: flaggedCount,
+                ),
+                const SizedBox(height: SpacingTokens.lg),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: _WebSurveysFilterBar(
+                    statusFilter: _statusFilter,
+                    onStatusFilterChanged: _updateStatusFilter,
+                  ),
+                ),
+                const SizedBox(height: SpacingTokens.xxl),
+                _WebSurveysTable(
+                  surveys: pagedSurveys,
+                  currentPage: currentPage,
+                  totalPages: totalPages,
+                  onPreviousPage: _previousPage,
+                  onNextPage: () => _nextPage(surveys.length),
+                  onOpenResponses: widget.onOpenResponses,
+                  onOpenAnalytics: widget.onOpenAnalytics,
+                  onDownloadOmr: (survey) =>
+                      _downloadOmrTemplate(context, survey),
+                  onMockAction: (value, survey) => _snack(
+                    context,
+                    '$value is a mock action for ${survey.name}',
+                  ),
+                ),
+                const SizedBox(height: SpacingTokens.xxl),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -607,18 +800,26 @@ class _SurveysPageState extends State<SurveysPage> {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MOBILE WIDGETS (preserved from original — do not modify)
+// ═══════════════════════════════════════════════════════════════════════════
+
 class _SurveysHero extends StatelessWidget {
   const _SurveysHero({
     required this.totalCount,
+    required this.statusFilter,
     required this.searchController,
     required this.onSearchChanged,
+    required this.onStatusFilterChanged,
     required this.onBack,
     required this.onNew,
   });
 
   final int totalCount;
+  final SurveyStatus? statusFilter;
   final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
+  final ValueChanged<SurveyStatus?> onStatusFilterChanged;
   final VoidCallback onBack;
   final VoidCallback onNew;
 
@@ -685,8 +886,9 @@ class _SurveysHero extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              Row(
-                children: [
+          const SizedBox(height: 12),
+          Row(
+            children: [
                   Expanded(
                     child: SizedBox(
                       height: 42,
@@ -767,6 +969,83 @@ class _SurveysHero extends StatelessWidget {
   }
 }
 
+class _WebSurveysFilterBar extends StatelessWidget {
+  const _WebSurveysFilterBar({
+    required this.statusFilter,
+    required this.onStatusFilterChanged,
+  });
+
+  final SurveyStatus? statusFilter;
+  final ValueChanged<SurveyStatus?> onStatusFilterChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.end,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          'Filter by status',
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: _SurveysPageState._bodyText,
+            letterSpacing: 0.2,
+          ),
+        ),
+        _SurveyFilterChip(
+          label: 'All',
+          selected: statusFilter == null,
+          onSelected: () => onStatusFilterChanged(null),
+        ),
+        _SurveyFilterChip(
+          label: 'Active',
+          selected: statusFilter == SurveyStatus.active,
+          onSelected: () => onStatusFilterChanged(SurveyStatus.active),
+        ),
+      ],
+    );
+  }
+}
+
+class _SurveyFilterChip extends StatelessWidget {
+  const _SurveyFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      selected: selected,
+      label: Text(label),
+      onSelected: (_) => onSelected(),
+      showCheckmark: false,
+      selectedColor: Colors.white,
+      backgroundColor: _SurveysPageState._mintChipBg.withValues(alpha: 0.65),
+      side: BorderSide(
+        color: selected
+            ? _SurveysPageState._border
+            : _SurveysPageState._border.withValues(alpha: 0.9),
+      ),
+      labelStyle: TextStyle(
+        color: selected
+            ? _SurveysPageState._headingText
+            : _SurveysPageState._bodyText,
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+  }
+}
+
 class _HeroCircle extends StatelessWidget {
   const _HeroCircle({required this.size, required this.opacity});
 
@@ -827,6 +1106,10 @@ class _HeaderPill extends StatelessWidget {
 class _SurveysPanel extends StatelessWidget {
   const _SurveysPanel({
     required this.surveys,
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPreviousPage,
+    required this.onNextPage,
     required this.onOpenResponses,
     required this.onOpenAnalytics,
     required this.onDownloadOmr,
@@ -834,6 +1117,10 @@ class _SurveysPanel extends StatelessWidget {
   });
 
   final List<SurveyRecord> surveys;
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback? onPreviousPage;
+  final VoidCallback? onNextPage;
   final void Function(SurveyRecord survey)? onOpenResponses;
   final void Function([String? surveyName]) onOpenAnalytics;
   final ValueChanged<SurveyRecord> onDownloadOmr;
@@ -842,7 +1129,6 @@ class _SurveysPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: _SurveysPageState._cardWhite,
@@ -856,9 +1142,13 @@ class _SurveysPanel extends StatelessWidget {
           ),
         ],
       ),
-      child: surveys.isEmpty
-          ? const _EmptySurveys()
-          : LayoutBuilder(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (surveys.isEmpty)
+            const _EmptySurveys()
+          else
+            LayoutBuilder(
               builder: (context, constraints) {
                 final columns = constraints.maxWidth >= 760 ? 2 : 1;
                 return GridView.builder(
@@ -884,6 +1174,18 @@ class _SurveysPanel extends StatelessWidget {
                 );
               },
             ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            child: _PaginationControls(
+              currentPage: currentPage,
+              totalPages: totalPages,
+              onPreviousPage: onPreviousPage,
+              onNextPage: onNextPage,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -914,6 +1216,54 @@ class _EmptySurveys extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PaginationControls extends StatelessWidget {
+  const _PaginationControls({
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPreviousPage,
+    required this.onNextPage,
+  });
+
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback? onPreviousPage;
+  final VoidCallback? onNextPage;
+
+  @override
+  Widget build(BuildContext context) {
+    final isFirstPage = currentPage == 0;
+    final isLastPage = currentPage >= totalPages - 1;
+
+    return Row(
+      children: [
+        Text(
+          'Page ${currentPage + 1} of $totalPages',
+          style: const TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+            color: _SurveysPageState._bodyText,
+          ),
+        ),
+        const Spacer(),
+        TextButton.icon(
+          onPressed: isFirstPage ? null : onPreviousPage,
+          icon: const Icon(Icons.chevron_left, size: 18),
+          label: const Text('Previous'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton.icon(
+          onPressed: isLastPage ? null : onNextPage,
+          icon: const Icon(Icons.chevron_right, size: 18),
+          label: const Text('Next'),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1078,20 +1428,9 @@ class _ResponsiveResponsesIcon extends StatelessWidget {
   final SurveyRecord survey;
   final void Function(SurveyRecord survey)? onOpenResponses;
 
-  bool _hasFlaggedResponses() {
-    // Generate mock responses for this survey and check for flagged ones
-    final responses = mock_data.buildMockResponses(survey);
-    final flaggedCount = responses.where((resp) {
-      // Flag responses with 2+ low scores
-      final lowScores = resp.answers.where((a) => a.score < 2).length;
-      return lowScores > 1;
-    }).length;
-    return flaggedCount > 0;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final hasFlagged = _hasFlaggedResponses();
+    final hasFlagged = _surveyHasFlaggedResponses(survey);
 
     return _CircleAction(
       tooltip: 'Responses',
@@ -1121,21 +1460,26 @@ class _StatusBadge extends StatelessWidget {
       SurveyStatus.inactive => 'Inactive',
     };
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: status == SurveyStatus.active
-            ? _SurveysPageState._mintChipBg
-            : color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.14)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.w800,
+    return Align(
+      alignment: Alignment.centerLeft,
+      widthFactor: 1,
+      heightFactor: 1,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: status == SurveyStatus.active
+              ? _SurveysPageState._mintChipBg
+              : color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: color.withValues(alpha: 0.14)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );
@@ -1459,5 +1803,532 @@ class _ShareButton extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB WIDGETS (modern design, matching the mobile teal palette)
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _WebSurveysHeader extends StatelessWidget {
+  const _WebSurveysHeader({
+    required this.totalCount,
+    required this.searchController,
+    required this.onSearchChanged,
+    required this.onNew,
+  });
+
+  final int totalCount;
+  final TextEditingController searchController;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onNew;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(SpacingTokens.lg),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _SurveysPageState._tealLight,
+            _SurveysPageState._tealDark,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: _SurveysPageState._tealDark.withValues(alpha: 0.25),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Surveys',
+                  style: GoogleFonts.inter(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$totalCount surveys in the system',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 300,
+            height: 44,
+            child: TextField(
+              controller: searchController,
+              onChanged: onSearchChanged,
+              cursorColor: Colors.white,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Search surveys',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 18,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.16),
+                contentPadding: EdgeInsets.zero,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(999),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          SizedBox(
+            height: 44,
+            child: FilledButton.icon(
+              onPressed: onNew,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('New Survey'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: _SurveysPageState._headingText,
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WebSurveysStatsRow extends StatelessWidget {
+  const _WebSurveysStatsRow({
+    required this.totalCount,
+    required this.activeCount,
+    required this.totalResponses,
+    required this.flaggedCount,
+  });
+
+  final int totalCount;
+  final int activeCount;
+  final int totalResponses;
+  final int flaggedCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      _WebSurveyStat(
+        label: 'Total Surveys',
+        value: totalCount.toString(),
+        icon: Icons.table_chart_outlined,
+        iconBg: _SurveysPageState._mintChipBg,
+        iconColor: _SurveysPageState._iconTeal,
+      ),
+      _WebSurveyStat(
+        label: 'Active Surveys',
+        value: activeCount.toString(),
+        icon: Icons.assignment_turned_in_outlined,
+        iconBg: _SurveysPageState._successGreen.withValues(alpha: 0.12),
+        iconColor: _SurveysPageState._successGreen,
+      ),
+      _WebSurveyStat(
+        label: 'Total Responses',
+        value: _formatNumber(totalResponses),
+        icon: Icons.groups_outlined,
+        iconBg: _SurveysPageState._infoBlue.withValues(alpha: 0.12),
+        iconColor: _SurveysPageState._infoBlue,
+      ),
+    ];
+
+    return Row(
+      children: stats.asMap().entries.map((entry) {
+        final isLast = entry.key == stats.length - 1;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : SpacingTokens.lg),
+            child: _WebSurveyStatCard(stat: entry.value),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String _formatNumber(int n) {
+    if (n >= 1000) {
+      final s = (n / 1000).toStringAsFixed(1);
+      return '${s.replaceAll('.0', '')},${(n % 1000).toString().padLeft(3, '0')}';
+    }
+    return n.toString();
+  }
+}
+
+class _WebSurveyStat {
+  const _WebSurveyStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+}
+
+class _WebSurveyStatCard extends StatelessWidget {
+  const _WebSurveyStatCard({required this.stat});
+
+  final _WebSurveyStat stat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(SpacingTokens.lg),
+      decoration: BoxDecoration(
+        color: _SurveysPageState._cardWhite,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _SurveysPageState._border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: stat.iconBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(stat.icon, color: stat.iconColor, size: 22),
+          ),
+          const SizedBox(width: SpacingTokens.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  stat.label,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: _SurveysPageState._bodyText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  stat.value,
+                  style: GoogleFonts.inter(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: _SurveysPageState._headingText,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WebSurveysTable extends StatelessWidget {
+  const _WebSurveysTable({
+    required this.surveys,
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPreviousPage,
+    required this.onNextPage,
+    required this.onOpenResponses,
+    required this.onOpenAnalytics,
+    required this.onDownloadOmr,
+    required this.onMockAction,
+  });
+
+  final List<SurveyRecord> surveys;
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback? onPreviousPage;
+  final VoidCallback? onNextPage;
+  final void Function(SurveyRecord survey)? onOpenResponses;
+  final void Function([String? surveyName]) onOpenAnalytics;
+  final ValueChanged<SurveyRecord> onDownloadOmr;
+  final void Function(String value, SurveyRecord survey) onMockAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: _SurveysPageState._cardWhite,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _SurveysPageState._border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(SpacingTokens.lg),
+            child: Text(
+              'All Surveys',
+              style: GoogleFonts.inter(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: _SurveysPageState._headingText,
+              ),
+            ),
+          ),
+          const Divider(height: 1, color: _SurveysPageState._border),
+          if (surveys.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 56),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.table_chart_outlined,
+                      size: 42,
+                      color: _SurveysPageState._bodyText,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'No surveys found.',
+                      style: TextStyle(
+                        color: _SurveysPageState._bodyText,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: SpacingTokens.lg,
+                vertical: SpacingTokens.md,
+              ),
+              color: _SurveysPageState._mintChipBg.withValues(alpha: 0.4),
+              child: Row(
+                children: [
+                  Expanded(flex: 3, child: _headerLabel('SURVEY NAME')),
+                  Expanded(flex: 2, child: _headerLabel('TEMPLATE')),
+                  Expanded(child: _headerLabel('STATUS')),
+                  Expanded(child: _headerLabel('RESPONSES')),
+                  Expanded(child: _headerLabel('CREATED')),
+                  const SizedBox(width: 120),
+                ],
+              ),
+            ),
+            const Divider(height: 1, color: _SurveysPageState._border),
+            ...surveys.asMap().entries.map((entry) {
+              final survey = entry.value;
+              final isLast = entry.key == surveys.length - 1;
+              return Column(
+                children: [
+                  _WebSurveyRow(
+                    survey: survey,
+                    onOpenResponses: onOpenResponses,
+                    onOpenAnalytics: onOpenAnalytics,
+                    onDownloadOmr: onDownloadOmr,
+                    onMockAction: onMockAction,
+                  ),
+                  if (!isLast) const Divider(height: 1, color: _SurveysPageState._border),
+                ],
+              );
+            }),
+          ],
+          const Divider(height: 1, color: _SurveysPageState._border),
+          Padding(
+            padding: const EdgeInsets.all(SpacingTokens.lg),
+            child: _PaginationControls(
+              currentPage: currentPage,
+              totalPages: totalPages,
+              onPreviousPage: onPreviousPage,
+              onNextPage: onNextPage,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerLabel(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: _SurveysPageState._bodyText,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+}
+
+class _WebSurveyRow extends StatelessWidget {
+  const _WebSurveyRow({
+    required this.survey,
+    required this.onOpenResponses,
+    required this.onOpenAnalytics,
+    required this.onDownloadOmr,
+    required this.onMockAction,
+  });
+
+  final SurveyRecord survey;
+  final void Function(SurveyRecord survey)? onOpenResponses;
+  final void Function([String? surveyName]) onOpenAnalytics;
+  final ValueChanged<SurveyRecord> onDownloadOmr;
+  final void Function(String value, SurveyRecord survey) onMockAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.lg,
+        vertical: SpacingTokens.md,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              survey.name,
+              style: GoogleFonts.inter(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                color: _SurveysPageState._headingText,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              survey.templateUsed,
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: _SurveysPageState._bodyText,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(child: _StatusBadge(status: survey.status)),
+          Expanded(
+            child: Text(
+              '${survey.responses}',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: _SurveysPageState._headingText,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              _formatDate(survey.createdDate),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: _SurveysPageState._bodyText,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 120,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                _ResponsiveResponsesIcon(
+                  survey: survey,
+                  onOpenResponses: onOpenResponses,
+                ),
+                const SizedBox(width: 4),
+                _CircleAction(
+                  tooltip: 'Analytics',
+                  icon: Icons.bar_chart_outlined,
+                  color: _SurveysPageState._infoBlue,
+                  onPressed: () => onOpenAnalytics(survey.name),
+                ),
+                const SizedBox(width: 4),
+                _MoreSurveyAction(
+                  survey: survey,
+                  onDownloadOmr: onDownloadOmr,
+                  onMockAction: onMockAction,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _formatDate(String value) {
+    final parsed = DateTime.tryParse(value);
+    if (parsed == null) return value;
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${months[parsed.month - 1]} ${parsed.day.toString().padLeft(2, '0')}, ${parsed.year}';
   }
 }

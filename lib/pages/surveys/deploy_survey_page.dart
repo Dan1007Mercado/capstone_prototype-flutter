@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../state/app_state.dart';
+import '../../widgets/web_sidebar.dart';
+import '../../widgets/web_topbar.dart';
+import '../../widgets/responsive_shell.dart';
+import '../auth/login.dart';
+import '../settings/settings_page.dart';
 
 class DeploySurveyPage extends StatefulWidget {
   const DeploySurveyPage({super.key});
@@ -92,6 +97,20 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 900) {
+          return _buildMobileLayout(context);
+        }
+        return _buildWebLayout(context);
+      },
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MOBILE LAYOUT (preserved from original — do not modify)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildMobileLayout(BuildContext context) {
     final appState = AppStateScope.of(context);
 
     return Scaffold(
@@ -813,6 +832,515 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
     );
   }
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // WEB LAYOUT (modern two-column design, now with sidebar + topbar shell
+  // matching the rest of the web app)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildWebLayout(BuildContext context) {
+    final appState = AppStateScope.of(context);
+
+    InputDecoration fieldDecoration({
+      required String label,
+      required IconData icon,
+      String? hint,
+      bool alignTop = false,
+    }) {
+      return InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        hintText: hint,
+        hintStyle: TextStyle(color: _bodyText.withValues(alpha: 0.6), fontSize: 13),
+        prefixIcon: Padding(
+          padding: alignTop ? const EdgeInsets.only(bottom: 48) : const EdgeInsets.all(12),
+          child: Icon(icon, size: 20, color: _iconTeal),
+        ),
+        alignLabelWithHint: alignTop,
+        filled: true,
+        fillColor: const Color(0xFFF8FCFD),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _iconTeal, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE11D48)),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: _pageBg,
+      body: Row(
+        children: [
+          // ── Left navigation sidebar (matches the rest of the web app) ──
+          WebSidebar(
+            currentIndex: 1, // Deploy Survey lives under the Surveys section
+            onNavigate: (index) {
+              // This page is a standalone pushed route, so switching a
+              // sidebar tab returns the user into the main shell on that tab.
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(
+                  builder: (_) => ResponsiveShell(initialIndex: index),
+                ),
+                (route) => false,
+              );
+            },
+            onLogout: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+                (route) => false,
+              );
+            },
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                WebTopbar(
+                  onSettings: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SettingsPage(),
+                    ),
+                  ),
+                  unreadNotifications: appState.unreadNotifications,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(28),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1280),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // ── Page header row ─────────────────────────
+                            Row(
+                              children: [
+                                Material(
+                                  color: _cardWhite,
+                                  shape: const CircleBorder(side: BorderSide(color: _border)),
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: () => Navigator.pop(context),
+                                    child: const SizedBox(
+                                      width: 40,
+                                      height: 40,
+                                      child: Icon(Icons.arrow_back_rounded, size: 20, color: _headingText),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Deploy New Survey',
+                                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                              fontWeight: FontWeight.w800,
+                                              color: _headingText,
+                                              letterSpacing: -0.4,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Launch a new survey experience with the same polished workflow.',
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                              color: _bodyText,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: _mintChipBg,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.info_outline, size: 14, color: _iconTeal),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Mock Form',
+                                        style: TextStyle(
+                                          color: _iconTeal,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            // ── Two-column body ─────────────────────────
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Left: form card
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: _cardWhite,
+                                      borderRadius: BorderRadius.circular(18),
+                                      border: Border.all(color: _border, width: 0.5),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.03),
+                                          blurRadius: 14,
+                                          offset: const Offset(0, 6),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: _mintChipBg,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: const Icon(
+                                                  Icons.description_outlined,
+                                                  size: 18,
+                                                  color: _iconTeal,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Survey Information',
+                                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                                          fontWeight: FontWeight.w800,
+                                                          color: _headingText,
+                                                          letterSpacing: -0.1,
+                                                        ),
+                                                  ),
+                                                  Text(
+                                                    'Mock deploy form with frontend-only state updates',
+                                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                                          color: _bodyText,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 24),
+
+                                          // Title + Category (two-up on wide form)
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                flex: 3,
+                                                child: TextFormField(
+                                                  controller: _titleController,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: _headingText,
+                                                  ),
+                                                  decoration: fieldDecoration(
+                                                    label: 'Survey Title',
+                                                    icon: Icons.title_rounded,
+                                                    hint: 'Enter survey title',
+                                                  ),
+                                                  validator: (value) => value == null || value.trim().isEmpty
+                                                      ? 'Survey title is required'
+                                                      : null,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 14),
+                                              Expanded(
+                                                flex: 2,
+                                                child: DropdownButtonFormField<String>(
+                                                  initialValue: _selectedCategory,
+                                                  items: _categories
+                                                      .map(
+                                                        (category) => DropdownMenuItem(
+                                                          value: category,
+                                                          child: Text(category),
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                                  onChanged: (value) => setState(
+                                                    () => _selectedCategory = value ?? _selectedCategory,
+                                                  ),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: _headingText,
+                                                  ),
+                                                  decoration: fieldDecoration(
+                                                    label: 'Category',
+                                                    icon: Icons.category_rounded,
+                                                  ),
+                                                  icon: const Icon(
+                                                    Icons.keyboard_arrow_down_rounded,
+                                                    color: _bodyText,
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 14),
+
+                                          // Description
+                                          TextFormField(
+                                            controller: _descriptionController,
+                                            maxLines: 3,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: _headingText,
+                                            ),
+                                            decoration: fieldDecoration(
+                                              label: 'Description',
+                                              icon: Icons.article_rounded,
+                                              hint: 'Describe your survey purpose',
+                                              alignTop: true,
+                                            ),
+                                            validator: (value) => value == null || value.trim().isEmpty
+                                                ? 'Description is required'
+                                                : null,
+                                          ),
+                                          const SizedBox(height: 14),
+
+                                          // Template + Target (two-up)
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                flex: 3,
+                                                child: DropdownButtonFormField<String>(
+                                                  initialValue: _template,
+                                                  items: const [
+                                                    DropdownMenuItem(
+                                                      value: 'Community Health Survey',
+                                                      child: Text('Community Health Survey'),
+                                                    ),
+                                                    DropdownMenuItem(
+                                                      value: 'Educational Satisfaction Survey',
+                                                      child: Text('Educational Satisfaction Survey'),
+                                                    ),
+                                                    DropdownMenuItem(
+                                                      value: 'Barangay Assessment Form',
+                                                      child: Text('Barangay Assessment Form'),
+                                                    ),
+                                                    DropdownMenuItem(
+                                                      value: 'Healthcare Access Survey',
+                                                      child: Text('Healthcare Access Survey'),
+                                                    ),
+                                                  ],
+                                                  onChanged: (value) => setState(() => _template = value ?? _template),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: _headingText,
+                                                  ),
+                                                  decoration: fieldDecoration(
+                                                    label: 'Template Selection',
+                                                    icon: Icons.dashboard_rounded,
+                                                  ),
+                                                  icon: const Icon(
+                                                    Icons.keyboard_arrow_down_rounded,
+                                                    color: _bodyText,
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 14),
+                                              Expanded(
+                                                flex: 2,
+                                                child: DropdownButtonFormField<String>(
+                                                  initialValue: _targetController.text,
+                                                  items: const [
+                                                    DropdownMenuItem(value: '100', child: Text('100')),
+                                                    DropdownMenuItem(value: '250', child: Text('250')),
+                                                    DropdownMenuItem(value: '500', child: Text('500')),
+                                                    DropdownMenuItem(value: '1000', child: Text('1000')),
+                                                  ],
+                                                  onChanged: (value) =>
+                                                      setState(() => _targetController.text = value ?? '250'),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: _headingText,
+                                                  ),
+                                                  decoration: fieldDecoration(
+                                                    label: 'Target Responses',
+                                                    icon: Icons.people_alt_rounded,
+                                                  ),
+                                                  icon: const Icon(
+                                                    Icons.keyboard_arrow_down_rounded,
+                                                    color: _bodyText,
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 14),
+
+                                          // Date Fields
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _DateField(
+                                                  label: 'Start Date',
+                                                  value: _startDate,
+                                                  icon: Icons.calendar_today_rounded,
+                                                  onTap: () async {
+                                                    final picked =
+                                                        await _pickDate(context, _startDate ?? DateTime.now());
+                                                    if (picked != null) setState(() => _startDate = picked);
+                                                  },
+                                                ),
+                                              ),
+                                              const SizedBox(width: 14),
+                                              Expanded(
+                                                child: _DateField(
+                                                  label: 'End Date',
+                                                  value: _endDate,
+                                                  icon: Icons.event_rounded,
+                                                  onTap: () async {
+                                                    final picked = await _pickDate(
+                                                      context,
+                                                      _endDate ?? DateTime.now().add(const Duration(days: 7)),
+                                                    );
+                                                    if (picked != null) setState(() => _endDate = picked);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 28),
+                                          Container(height: 1, color: _border),
+                                          const SizedBox(height: 20),
+
+                                          // Action Buttons
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              OutlinedButton(
+                                                onPressed: () => Navigator.pop(context),
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: _bodyText,
+                                                  side: const BorderSide(color: _border),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                                                ),
+                                                child: const Text(
+                                                  'Cancel',
+                                                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              FilledButton.icon(
+                                                onPressed: () {
+                                                  if (!_formKey.currentState!.validate()) return;
+                                                  final deployed = appState.deploySurvey(
+                                                    title: _titleController.text.trim(),
+                                                    description: _descriptionController.text.trim(),
+                                                    templateName: _template,
+                                                    targetResponses: _targetController.text,
+                                                    startDate: _startDate ?? DateTime.now(),
+                                                    endDate:
+                                                        _endDate ?? DateTime.now().add(const Duration(days: 7)),
+                                                  );
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text('${deployed.name} deployed successfully'),
+                                                      behavior: SnackBarBehavior.floating,
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                    ),
+                                                  );
+                                                  Future.delayed(const Duration(milliseconds: 500), () {
+                                                    if (context.mounted) Navigator.pop(context);
+                                                  });
+                                                },
+                                                icon: const Icon(Icons.rocket_launch_rounded, size: 16),
+                                                label: const Text('Deploy Survey'),
+                                                style: FilledButton.styleFrom(
+                                                  backgroundColor: _iconTeal,
+                                                  foregroundColor: Colors.white,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                                                  textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 24),
+
+                                // Right: live summary + tips sidebar
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      _WebSummaryCard(
+                                        title: _titleController.text.trim().isEmpty
+                                            ? 'Untitled survey'
+                                            : _titleController.text.trim(),
+                                        category: _selectedCategory,
+                                        template: _template,
+                                        target: _targetController.text,
+                                        startDate: _startDate,
+                                        endDate: _endDate,
+                                      ),
+                                      const SizedBox(height: 20),
+                                      const _WebTipsCard(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<DateTime?> _pickDate(BuildContext context, DateTime initial) {
     return showDatePicker(
       context: context,
@@ -837,6 +1365,10 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MOBILE WIDGET (preserved from original — do not modify)
+// ═══════════════════════════════════════════════════════════════════════════
 
 class _DateField extends StatelessWidget {
   const _DateField({
@@ -909,6 +1441,262 @@ class _DateField extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEB WIDGETS (modern design, matching the mobile teal palette)
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _WebSummaryCard extends StatelessWidget {
+  const _WebSummaryCard({
+    required this.title,
+    required this.category,
+    required this.template,
+    required this.target,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  final String title;
+  final String category;
+  final String template;
+  final String target;
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  static const Color _tealDark = Color.fromARGB(255, 13, 232, 232);
+  static const Color _tealLight = Color(0xFF2DD4CF);
+  static const Color _headingText = Color(0xFF0E2A2E);
+  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _border = Color(0xFFDDECEF);
+
+  String _fmt(DateTime? d) {
+    if (d == null) return 'Not set';
+    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_tealLight, _tealDark],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: _tealDark.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            right: -30,
+            top: -50,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.14),
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Preview',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                  letterSpacing: -0.3,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 16),
+              _summaryRow(Icons.category_rounded, 'Category', category),
+              const SizedBox(height: 10),
+              _summaryRow(Icons.dashboard_rounded, 'Template', template),
+              const SizedBox(height: 10),
+              _summaryRow(Icons.people_alt_rounded, 'Target', '$target responses'),
+              const SizedBox(height: 10),
+              _summaryRow(
+                Icons.date_range_rounded,
+                'Duration',
+                '${_fmt(startDate)}  →  ${_fmt(endDate)}',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 15, color: Colors.white.withValues(alpha: 0.85)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WebTipsCard extends StatelessWidget {
+  const _WebTipsCard();
+
+  static const Color _cardWhite = Color(0xFFFFFFFF);
+  static const Color _iconTeal = Color(0xFF14B8A6);
+  static const Color _mintChipBg = Color(0xFFDFF5F3);
+  static const Color _headingText = Color(0xFF0E2A2E);
+  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _border = Color(0xFFDDECEF);
+
+  static const _tips = [
+    'Keep the title short and specific so respondents know what to expect.',
+    'Pick the template that best matches your survey\'s goal to save setup time.',
+    'A realistic target response count helps you track progress accurately.',
+    'Set a clear start and end date to keep the survey window focused.',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _cardWhite,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _mintChipBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.lightbulb_outline_rounded, size: 18, color: _iconTeal),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Tips for a great survey',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13.5,
+                  color: _headingText,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ..._tips.map(
+            (tip) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    width: 5,
+                    height: 5,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _iconTeal,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      tip,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: _bodyText,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
