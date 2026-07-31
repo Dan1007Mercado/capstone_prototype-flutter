@@ -365,13 +365,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
 
                         const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _genderController,
-                          decoration: const InputDecoration(
-                            labelText: 'Gender',
-                            prefixIcon: Icon(Icons.boy_outlined, size: 20),
-                          ),
-                        ),
                         const SizedBox(height: 14),
                         TextFormField(
                           controller: _phoneController,
@@ -958,14 +951,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: _genderController,
-                decoration: const InputDecoration(
-                  labelText: 'Gender',
-                  prefixIcon: Icon(Icons.boy_outlined, size: 20),
-                ),
-              ),
+              
+              
               const SizedBox(height: 14),
               TextFormField(
                 controller: _phoneController,

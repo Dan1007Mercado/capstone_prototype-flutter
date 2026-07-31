@@ -361,10 +361,10 @@ Color responseStatusColor(ResponseStatus status) {
 String responseStatusLabel(ResponseStatus status) {
   switch (status) {
     case ResponseStatus.synced:
-      return 'Synced';
+      return 'Completed';
     case ResponseStatus.pending:
       return 'Pending';
     case ResponseStatus.exported:
-      return 'Exported';
+      return 'Synced';
   }
 }
