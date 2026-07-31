@@ -498,7 +498,7 @@ class _NotificationTile extends StatelessWidget {
                 Text(
                   item.time,
                   style: GoogleFonts.inter(
-                    color: theme.onSurfaceVariant.withValues(alpha: 0.72),
+                    color: theme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 ),

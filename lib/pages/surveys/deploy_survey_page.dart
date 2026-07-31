@@ -38,8 +38,8 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _successGreen = Color(0xFF16A34A);
   static const Color _infoBlue = Color(0xFF2563EB);
   static const Color _border = Color(0xFFDDECEF);
@@ -359,7 +359,7 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                           ),
                           hintText: 'Enter survey title',
                           hintStyle: TextStyle(
-                            color: _bodyText.withValues(alpha: 0.6),
+                            color: _bodyText,
                             fontSize: 13,
                           ),
                           prefixIcon: const Padding(
@@ -483,7 +483,7 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
                           ),
                           hintText: 'Describe your survey purpose',
                           hintStyle: TextStyle(
-                            color: _bodyText.withValues(alpha: 0.6),
+                            color: _bodyText,
                             fontSize: 13,
                           ),
                           prefixIcon: const Padding(
@@ -849,7 +849,7 @@ class _DeploySurveyPageState extends State<DeploySurveyPage> {
         labelText: label,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         hintText: hint,
-        hintStyle: TextStyle(color: _bodyText.withValues(alpha: 0.6), fontSize: 13),
+        hintStyle: TextStyle(color: _bodyText, fontSize: 13),
         prefixIcon: Padding(
           padding: alignTop ? const EdgeInsets.only(bottom: 48) : const EdgeInsets.all(12),
           child: Icon(icon, size: 20, color: _iconTeal),
@@ -1408,7 +1408,7 @@ class _DateField extends StatelessWidget {
             child: Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Color(0xFF7C8A90),
+              color: Colors.black,
             ),
           ),
           filled: true,
@@ -1435,8 +1435,8 @@ class _DateField extends StatelessWidget {
               : '${value!.year}-${value!.month.toString().padLeft(2, '0')}-${value!.day.toString().padLeft(2, '0')}',
           style: TextStyle(
             color: value == null
-                ? const Color(0xFF7C8A90).withValues(alpha: 0.6)
-                : const Color(0xFF0E2A2E),
+                ? Colors.black
+                : Colors.black,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -1469,8 +1469,8 @@ class _WebSummaryCard extends StatelessWidget {
 
   static const Color _tealDark = Color.fromARGB(255, 13, 232, 232);
   static const Color _tealLight = Color(0xFF2DD4CF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _border = Color(0xFFDDECEF);
 
   String _fmt(DateTime? d) {
@@ -1612,8 +1612,8 @@ class _WebTipsCard extends StatelessWidget {
   static const Color _cardWhite = Color(0xFFFFFFFF);
   static const Color _iconTeal = Color(0xFF14B8A6);
   static const Color _mintChipBg = Color(0xFFDFF5F3);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _border = Color(0xFFDDECEF);
 
   static const _tips = [

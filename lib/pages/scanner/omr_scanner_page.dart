@@ -1020,7 +1020,7 @@ class _CameraScannerPageState extends State<_CameraScannerPage>
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 24),

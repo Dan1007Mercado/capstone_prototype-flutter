@@ -39,8 +39,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _successGreen = Color(0xFF16A34A);
   static const Color _infoBlue = Color(0xFF2563EB);
   static const Color _warningAmber = Color(0xFFD97706);
@@ -427,7 +427,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey.shade600,
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -686,7 +686,7 @@ class _WebAnalyticsHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: Colors.black,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -696,7 +696,7 @@ class _WebAnalyticsHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.black,
                   ),
                 ),
               ],

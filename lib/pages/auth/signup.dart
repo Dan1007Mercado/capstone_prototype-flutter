@@ -13,8 +13,8 @@ class _SignupColors {
   static const Color mintChipBg = Color(0xFFDFF5F3);
   static const Color pageBg = Color(0xFFF4F7F8);
   static const Color cardWhite = Color(0xFFFFFFFF);
-  static const Color headingText = Color(0xFF0E2A2E);
-  static const Color bodyText = Color(0xFF7C8A90);
+  static const Color headingText = Colors.black;
+  static const Color bodyText = Colors.black;
 }
 
 class SignupPage extends StatefulWidget {
@@ -199,7 +199,7 @@ class _SignupPageState extends State<SignupPage>
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon: Icon(icon, size: 20, color: const Color(0xFF9CA3AF)),
+      prefixIcon: Icon(icon, size: 20, color: Colors.black),
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: const Color(0xFFF9FAFB),
@@ -224,12 +224,12 @@ class _SignupPageState extends State<SignupPage>
         borderSide: const BorderSide(color: Color(0xFFE11D48), width: 2),
       ),
       labelStyle: GoogleFonts.inter(
-        color: const Color(0xFF374151),
+        color: Colors.black,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
       hintStyle: GoogleFonts.inter(
-        color: const Color(0xFF9CA3AF),
+        color: Colors.black,
         fontSize: 14,
       ),
       contentPadding: const EdgeInsets.symmetric(
@@ -822,7 +822,7 @@ class _SignupPageState extends State<SignupPage>
                               'Enter your details to get started with TalaanScan.',
                               style: GoogleFonts.inter(
                                 fontSize: 15,
-                                color: const Color(0xFF6B7280),
+                                color: Colors.black,
                                 height: 1.5,
                               ),
                             ),
@@ -947,7 +947,7 @@ class _SignupPageState extends State<SignupPage>
                                               ? Icons.visibility_off_outlined
                                               : Icons.visibility_outlined,
                                           size: 20,
-                                          color: const Color(0xFF9CA3AF),
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -988,7 +988,7 @@ class _SignupPageState extends State<SignupPage>
                                               ? Icons.visibility_off_outlined
                                               : Icons.visibility_outlined,
                                           size: 20,
-                                          color: const Color(0xFF9CA3AF),
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -1029,7 +1029,7 @@ class _SignupPageState extends State<SignupPage>
                                           TextSpan(
                                             style: GoogleFonts.inter(
                                               fontSize: 13,
-                                              color: const Color(0xFF374151),
+                                              color: Colors.black,
                                             ),
                                             children: [
                                               const TextSpan(
@@ -1123,7 +1123,7 @@ class _SignupPageState extends State<SignupPage>
                                           'or continue with',
                                           style: GoogleFonts.inter(
                                             fontSize: 13,
-                                            color: const Color(0xFF9CA3AF),
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
@@ -1153,12 +1153,12 @@ class _SignupPageState extends State<SignupPage>
                                         style: GoogleFonts.inter(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF374151),
+                                          color: Colors.black,
                                         ),
                                       ),
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor:
-                                            const Color(0xFF374151),
+                                            Colors.black,
                                         side: const BorderSide(
                                           color: Color(0xFFE5E7EB),
                                         ),
@@ -1181,7 +1181,7 @@ class _SignupPageState extends State<SignupPage>
                                         Text(
                                           'Already have an account?',
                                           style: GoogleFonts.inter(
-                                            color: const Color(0xFF6B7280),
+                                            color: Colors.black,
                                             fontSize: 14,
                                           ),
                                         ),
@@ -1325,7 +1325,7 @@ class _SignupPageState extends State<SignupPage>
                           'Enter your details to get started with TalaanScan.',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: const Color(0xFF6B7280),
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 28),
@@ -1448,7 +1448,7 @@ class _SignupPageState extends State<SignupPage>
                                           ? Icons.visibility_off_outlined
                                           : Icons.visibility_outlined,
                                       size: 20,
-                                      color: const Color(0xFF9CA3AF),
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -1489,7 +1489,7 @@ class _SignupPageState extends State<SignupPage>
                                           ? Icons.visibility_off_outlined
                                           : Icons.visibility_outlined,
                                       size: 20,
-                                      color: const Color(0xFF9CA3AF),
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -1529,7 +1529,7 @@ class _SignupPageState extends State<SignupPage>
                                       TextSpan(
                                         style: GoogleFonts.inter(
                                           fontSize: 12,
-                                          color: const Color(0xFF374151),
+                                          color: Colors.black,
                                         ),
                                         children: [
                                           const TextSpan(
@@ -1618,7 +1618,7 @@ class _SignupPageState extends State<SignupPage>
                                       'or continue with',
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
-                                        color: const Color(0xFF9CA3AF),
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -1647,11 +1647,11 @@ class _SignupPageState extends State<SignupPage>
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF374151),
+                                      color: Colors.black,
                                     ),
                                   ),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF374151),
+                                    foregroundColor: Colors.black,
                                     side: const BorderSide(
                                       color: Color(0xFFE5E7EB),
                                     ),
@@ -1672,7 +1672,7 @@ class _SignupPageState extends State<SignupPage>
                                     Text(
                                       'Already have an account?',
                                       style: GoogleFonts.inter(
-                                        color: const Color(0xFF6B7280),
+                                        color: Colors.black,
                                         fontSize: 13,
                                       ),
                                     ),

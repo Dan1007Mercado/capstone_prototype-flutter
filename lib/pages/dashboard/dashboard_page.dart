@@ -34,7 +34,7 @@ class DashboardPage extends StatefulWidget {
   static const Color _heroStart = Color.fromARGB(255, 130, 225, 230);
   static const Color _heroEnd = Color.fromARGB(255, 31, 185, 193);
   static const Color _brandDeep = Color.fromARGB(255, 36, 240, 203);
-  static const Color _mutedText = Color.fromARGB(255, 125, 135, 144);
+  static const Color _mutedText = Colors.black;
   static const Color _border = Color.fromARGB(255, 230, 237, 240);
   static const Color _panelTint = Color.fromARGB(255, 246, 250, 251);
 
@@ -470,7 +470,7 @@ class _MobileResponseOverview extends StatelessWidget {
                 child: Text(
                   'Response Overview',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: DashboardPage._brandDeep,
+                        color: const Color.fromARGB(255, 0, 0, 0),
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0,
                       ),
@@ -560,7 +560,7 @@ class _MobileActivityPanel extends StatelessWidget {
                     Text(
                       'Recent activity',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: DashboardPage._brandDeep,
+                            color: const Color.fromARGB(255, 0, 5, 4),
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0,
                           ),
@@ -770,7 +770,7 @@ class _WebDashboardHeader extends StatelessWidget {
           ),
           style: FilledButton.styleFrom(
             backgroundColor: const Color.fromARGB(255, 28, 196, 202),
-            foregroundColor: Colors.white,
+            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
             padding: const EdgeInsets.symmetric(
               horizontal: SpacingTokens.lg,
               vertical: SpacingTokens.md,
@@ -1511,7 +1511,7 @@ class _WebRecentSurveysTable extends StatelessWidget {
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: theme.onSurface,
-                    disabledForegroundColor: theme.onSurfaceVariant.withValues(alpha: 0.4),
+                    disabledForegroundColor: theme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(width: SpacingTokens.lg),
@@ -1535,7 +1535,7 @@ class _WebRecentSurveysTable extends StatelessWidget {
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: theme.onSurface,
-                    disabledForegroundColor: theme.onSurfaceVariant.withValues(alpha: 0.4),
+                    disabledForegroundColor: theme.onSurfaceVariant,
                   ),
                 ),
               ],

@@ -16,8 +16,8 @@ const Color _responsesTealDark = Color.fromARGB(255, 13, 232, 232);
 const Color _responsesTealLight = Color(0xFF2DD4CF);
 const Color _responsesIconTeal = Color(0xFF14B8A6);
 const Color _responsesMintChipBgSolid = Color(0xFFDFF5F3);
-const Color _responsesHeadingText = Color(0xFF0E2A2E);
-const Color _responsesBodyText = Color(0xFF7C8A90);
+const Color _responsesHeadingText = Colors.black;
+const Color _responsesBodyText = Colors.black;
 const Color _responsesCardWhite = Color(0xFFFFFFFF);
 const Color _responsesBorder = Color(0xFFDDECEF);
 const Color _responsesMintChipBg = Color(0xFFDFF5F3);
@@ -216,7 +216,7 @@ class _ResponsesPageState extends State<ResponsesPage> {
                                   Text(
                                     widget.survey.name,
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color: Colors.black,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -229,20 +229,20 @@ class _ResponsesPageState extends State<ResponsesPage> {
                         TextField(
                           controller: _searchController,
                           onChanged: _updateQuery,
-                          cursorColor: Colors.white,
+                          cursorColor: Colors.black,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
                           decoration: InputDecoration(
                             hintText: 'Search by response ID',
                             hintStyle: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.78),
+                              color: Colors.black,
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
-                            prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.82), size: 18),
+                            prefixIcon: Icon(Icons.search, color: Colors.black, size: 18),
                             filled: true,
                             fillColor: Colors.white.withValues(alpha: 0.18),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
@@ -1053,7 +1053,7 @@ class _WebResponsesHeader extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: Colors.black,
                         letterSpacing: -0.4,
                       ),
                     ),
@@ -1063,7 +1063,7 @@ class _WebResponsesHeader extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.black,
                       ),
                     ),
                   ],
@@ -1094,20 +1094,20 @@ class _WebResponsesHeader extends StatelessWidget {
             child: TextField(
               controller: searchController,
               onChanged: onSearchChanged,
-              cursorColor: Colors.white,
+              cursorColor: Colors.black,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
                 hintText: 'Search by response ID',
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.78),
+                  color: Colors.black,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
-                prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.82), size: 18),
+                prefixIcon: Icon(Icons.search, color: Colors.black, size: 18),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.16),
                 contentPadding: EdgeInsets.zero,

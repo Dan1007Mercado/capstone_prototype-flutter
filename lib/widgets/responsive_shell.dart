@@ -92,7 +92,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                         style: Theme.of(context).textTheme.titleLarge
                             ?.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: const Color(0xFF153D4A),
+                              color: Colors.black,
                               letterSpacing: 0,
                             ),
                       ),
@@ -233,7 +233,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                   'Confirm Logout',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF153D4A),
+                    color: Colors.black,
                     letterSpacing: 0,
                   ),
                 ),
@@ -244,7 +244,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                   'Are you sure you want to log out of your account? You will need to sign in again to access your surveys and data.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF7D8790),
+                    color: Colors.black,
                     height: 1.5,
                   ),
                 ),
@@ -257,7 +257,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(dialogContext).pop(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF153D4A),
+                          foregroundColor: Colors.black,
                           side: BorderSide(color: AppColors.divider),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -368,7 +368,7 @@ class _ResponsiveShellState extends State<ResponsiveShell> {
               WebSidebar(
                 currentIndex: _index,
                 onNavigate: _onNavigate,
-                onLogout: _handleLogout, // Add the logout callback
+                onLogout: _performLogout,
               ),
               Expanded(
                 child: Column(

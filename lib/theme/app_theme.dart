@@ -37,7 +37,7 @@ class AppPalette {
   static const slate200 = Color(0xFFDBDEF0);
   static const slate300 = Color(0xFFC2C4D6);
   static const slate400 = Color(0xFF9A9BA8);
-  static const slate500 = Color(0xFF7D7E8C);
+  static const slate500 = Colors.black;
   static const slate600 = Color(0xFF5F6070);
   static const slate700 = Color(0xFF454654);
   static const slate800 = Color(0xFF2E2E3A);
@@ -77,9 +77,9 @@ class AppColors {
   static const primaryHover = AppPalette.primary400;
   static const primaryPressed = AppPalette.primary600;
   static const primaryContainer = AppPalette.primary100;
-  static const textPrimary = AppPalette.slate800;
-  static const textSecondary = AppPalette.slate400;
-  static const textDisabled = AppPalette.slate300;
+  static const textPrimary = AppPalette.slate900;
+  static const textSecondary = AppPalette.slate800;
+  static const textDisabled = AppPalette.slate600;
   static const inputBg = Colors.white;
   static const inputBorder = AppPalette.slate200;
   static const success = AppPalette.success;
@@ -228,7 +228,7 @@ class AppThemeData extends ThemeExtension<AppThemeData> {
     surfaceContainer: AppPalette.slate50,
     surfaceContainerHigh: AppPalette.slate100,
     surfaceContainerHighest: AppPalette.slate200,
-    onSurfaceVariant: AppPalette.slate500,
+    onSurfaceVariant: AppPalette.slate800,
     background: AppPalette.slate50,
     onBackground: AppPalette.slate900,
     outline: AppPalette.slate200,
@@ -255,13 +255,13 @@ class AppThemeData extends ThemeExtension<AppThemeData> {
     secondaryContainer: AppPalette.teal800,
     onSecondaryContainer: AppPalette.teal200,
     surface: AppPalette.slate900,
-    onSurface: AppPalette.slate100,
+    onSurface: Colors.black,
     surfaceContainer: AppPalette.slate800,
     surfaceContainerHigh: AppPalette.slate850,
     surfaceContainerHighest: AppPalette.slate700,
-    onSurfaceVariant: AppPalette.slate400,
+    onSurfaceVariant: Colors.black,
     background: AppPalette.slate950,
-    onBackground: AppPalette.slate100,
+    onBackground: Colors.black,
     outline: AppPalette.slate700,
     outlineVariant: AppPalette.slate800,
     error: AppPalette.error,
@@ -546,11 +546,11 @@ ThemeData buildAppTheme(Brightness brightness) {
       filled: true,
       fillColor: appTheme.surfaceContainer,
       hintStyle: TextStyle(
-        color: appTheme.onSurfaceVariant.withValues(alpha: 0.6),
+        color: appTheme.onSurfaceVariant,
         fontSize: 14,
       ),
       labelStyle: TextStyle(
-        color: appTheme.onSurfaceVariant,
+        color: appTheme.onSurface,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
@@ -660,7 +660,7 @@ ThemeData buildAppTheme(Brightness brightness) {
       headingRowHeight: 48,
       dividerThickness: 0.5,
       headingTextStyle: TextStyle(
-        color: appTheme.onSurfaceVariant,
+        color: appTheme.onSurface,
         fontWeight: FontWeight.w600,
         fontSize: 12,
         letterSpacing: 0.5,
@@ -736,7 +736,7 @@ ThemeData buildAppTheme(Brightness brightness) {
         letterSpacing: -0.2,
       ),
       contentTextStyle: TextStyle(
-        color: appTheme.onSurfaceVariant,
+        color: appTheme.onSurface,
         fontSize: 14,
         height: 1.5,
       ),

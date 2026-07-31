@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
-  // ─── Mobile Feature Chip ───────────────────────────────────────────────────
+  // --- Mobile Feature Chip ---------------------------------------------------
   Widget _buildFeatureChip(IconData icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -163,7 +163,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  // ─── Web Left Panel Feature Card ───────────────────────────────────────────
+  // --- Web Left Panel Feature Card -------------------------------------------
   Widget _buildWebFeatureCard(IconData icon, String title, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(SpacingTokens.lg),
@@ -229,12 +229,12 @@ class _LoginPageState extends State<LoginPage>
           width: 2,
         ),
       ),
-      labelStyle: GoogleFonts.inter(color: const Color(0xFF7C8A90)),
-      hintStyle: GoogleFonts.inter(color: const Color(0xFFAAB6BB)),
+      labelStyle: GoogleFonts.inter(color: Colors.black),
+      hintStyle: GoogleFonts.inter(color: Colors.black),
     );
   }
 
-  // ─── Web Input Decoration (cleaner, outlined) ──────────────────────────────
+  // --- Web Input Decoration (cleaner, outlined) ------------------------------
   InputDecoration _webInputDecoration({
     required String label,
     required String hint,
@@ -244,7 +244,7 @@ class _LoginPageState extends State<LoginPage>
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon: Icon(icon, size: 20, color: const Color(0xFF9CA3AF)),
+      prefixIcon: Icon(icon, size: 20, color: Colors.black),
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: const Color(0xFFF9FAFB),
@@ -269,12 +269,12 @@ class _LoginPageState extends State<LoginPage>
         borderSide: const BorderSide(color: Color(0xFFE11D48), width: 2),
       ),
       labelStyle: GoogleFonts.inter(
-        color: const Color(0xFF374151),
+        color: Colors.black,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
       hintStyle: GoogleFonts.inter(
-        color: const Color(0xFF9CA3AF),
+        color: Colors.black,
         fontSize: 14,
       ),
       contentPadding: const EdgeInsets.symmetric(
@@ -284,7 +284,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  // ─── MOBILE LAYOUT (preserved exactly) ─────────────────────────────────────
+  // --- MOBILE LAYOUT (preserved exactly) -------------------------------------
   Widget _buildMobileLayout() {
     return Scaffold(
       body: Container(
@@ -396,7 +396,7 @@ class _LoginPageState extends State<LoginPage>
                               Text(
                                 'Sign in',
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF0E2A2E),
+                                  color: Colors.black,
                                   fontSize: 25,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -405,7 +405,7 @@ class _LoginPageState extends State<LoginPage>
                               Text(
                                 'Use your email and password to enter the workspace.',
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF647680),
+                                  color: Colors.black,
                                   fontSize: 14,
                                 ),
                               ),
@@ -415,7 +415,7 @@ class _LoginPageState extends State<LoginPage>
                                 keyboardType: TextInputType.emailAddress,
                                 textInputAction: TextInputAction.next,
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF0E2A2E),
+                                  color: Colors.black,
                                 ),
                                 decoration: _inputDecoration(
                                   label: 'Email',
@@ -440,7 +440,7 @@ class _LoginPageState extends State<LoginPage>
                                 textInputAction: TextInputAction.done,
                                 onFieldSubmitted: (_) => _login(),
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF0E2A2E),
+                                  color: Colors.black,
                                 ),
                                 decoration: _inputDecoration(
                                   label: 'Password',
@@ -457,7 +457,7 @@ class _LoginPageState extends State<LoginPage>
                                           ? Icons.visibility_off_outlined
                                           : Icons.visibility_outlined,
                                       size: 22,
-                                      color: const Color(0xFF7C8A90),
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -568,7 +568,7 @@ class _LoginPageState extends State<LoginPage>
                                     Text(
                                       'No account yet?',
                                       style: GoogleFonts.inter(
-                                        color: const Color(0xFF647680),
+                                        color: Colors.black,
                                       ),
                                     ),
                                     GestureDetector(
@@ -629,13 +629,13 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  // ─── WEB LAYOUT (split-screen, reference-image inspired) ───────────────────
+  // --- WEB LAYOUT (split-screen, reference-image inspired) -------------------
   Widget _buildWebLayout() {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // ── Left Panel ──────────────────────────────────────────────────────
+          // -- Left Panel ------------------------------------------------------
           Expanded(
             flex: 45,
             child: Container(
@@ -736,7 +736,7 @@ class _LoginPageState extends State<LoginPage>
               ),
             ),
           ),
-          // ── Right Panel ─────────────────────────────────────────────────────
+          // -- Right Panel -----------------------------------------------------
           Expanded(
             flex: 55,
             child: Center(
@@ -796,7 +796,7 @@ class _LoginPageState extends State<LoginPage>
                               'Please enter your details to continue.',
                               style: GoogleFonts.inter(
                                 fontSize: 15,
-                                color: const Color(0xFF6B7280),
+                                color: Colors.black,
                                 height: 1.5,
                               ),
                             ),
@@ -860,7 +860,7 @@ class _LoginPageState extends State<LoginPage>
                                               ? Icons.visibility_off_outlined
                                               : Icons.visibility_outlined,
                                           size: 20,
-                                          color: const Color(0xFF9CA3AF),
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -903,7 +903,7 @@ class _LoginPageState extends State<LoginPage>
                                             'Remember me',
                                             style: GoogleFonts.inter(
                                               fontSize: 13,
-                                              color: const Color(0xFF374151),
+                                              color: Colors.black,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -994,7 +994,7 @@ class _LoginPageState extends State<LoginPage>
                                           'or continue with',
                                           style: GoogleFonts.inter(
                                             fontSize: 13,
-                                            color: const Color(0xFF9CA3AF),
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
@@ -1024,12 +1024,12 @@ class _LoginPageState extends State<LoginPage>
                                         style: GoogleFonts.inter(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF374151),
+                                          color: Colors.black,
                                         ),
                                       ),
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor:
-                                            const Color(0xFF374151),
+                                            Colors.black,
                                         side: const BorderSide(
                                           color: Color(0xFFE5E7EB),
                                         ),
@@ -1052,7 +1052,7 @@ class _LoginPageState extends State<LoginPage>
                                         Text(
                                           "Don't have an account?",
                                           style: GoogleFonts.inter(
-                                            color: const Color(0xFF6B7280),
+                                            color: Colors.black,
                                             fontSize: 14,
                                           ),
                                         ),
@@ -1122,7 +1122,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  // ─── SMALL WEB LAYOUT (narrow desktop/tablet) ──────────────────────────────
+  // --- SMALL WEB LAYOUT (narrow desktop/tablet) ------------------------------
   Widget _buildSmallWebLayout() {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -1195,7 +1195,7 @@ class _LoginPageState extends State<LoginPage>
                           'Please enter your details to continue.',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: const Color(0xFF6B7280),
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 28),
@@ -1253,7 +1253,7 @@ class _LoginPageState extends State<LoginPage>
                                           ? Icons.visibility_off_outlined
                                           : Icons.visibility_outlined,
                                       size: 20,
-                                      color: const Color(0xFF9CA3AF),
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -1295,7 +1295,7 @@ class _LoginPageState extends State<LoginPage>
                                         'Remember me',
                                         style: GoogleFonts.inter(
                                           fontSize: 13,
-                                          color: const Color(0xFF374151),
+                                          color: Colors.black,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -1383,7 +1383,7 @@ class _LoginPageState extends State<LoginPage>
                                       'or continue with',
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
-                                        color: const Color(0xFF9CA3AF),
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -1412,11 +1412,11 @@ class _LoginPageState extends State<LoginPage>
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF374151),
+                                      color: Colors.black,
                                     ),
                                   ),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF374151),
+                                    foregroundColor: Colors.black,
                                     side: const BorderSide(
                                       color: Color(0xFFE5E7EB),
                                     ),
@@ -1437,7 +1437,7 @@ class _LoginPageState extends State<LoginPage>
                                     Text(
                                       "Don't have an account?",
                                       style: GoogleFonts.inter(
-                                        color: const Color(0xFF6B7280),
+                                        color: Colors.black,
                                         fontSize: 13,
                                       ),
                                     ),

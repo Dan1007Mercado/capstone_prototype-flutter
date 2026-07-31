@@ -56,8 +56,8 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _border = Color(0xFFDDECEF);
   static const Color _infoBlue = Color(0xFF2563EB);
   static const Color _successGreen = Color(0xFF16A34A);
@@ -394,7 +394,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                   style: GoogleFonts.inter(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: Colors.black,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -406,7 +406,7 @@ class _TemplateBuilderPageState extends State<TemplateBuilderPage> {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -1331,8 +1331,8 @@ class _StyleOptionCard extends StatelessWidget {
   static const Color _tealDark = Color(0xFF0F9B9B);
   static const Color _border = Color(0xFFDDECEF);
   static const Color _pageBg = Color(0xFFF4F7F8);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
 
   @override
   Widget build(BuildContext context) {

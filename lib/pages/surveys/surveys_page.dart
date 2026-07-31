@@ -59,8 +59,8 @@ class _SurveysPageState extends State<SurveysPage> {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _successGreen = Color(0xFF16A34A);
   static const Color _dangerRed = Color(0xFFE11D48);
   static const Color _infoBlue = Color(0xFF2563EB);
@@ -877,14 +877,6 @@ class _SurveysHero extends StatelessWidget {
             children: [
               
               const SizedBox(height: 1),
-              const SizedBox(height: 2),
-              Text(
-                '$totalCount surveys in the system',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.90),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
               const SizedBox(height: 18),
           const SizedBox(height: 12),
           Row(
@@ -895,23 +887,23 @@ class _SurveysHero extends StatelessWidget {
                       child: TextField(
                         controller: searchController,
                         onChanged: onSearchChanged,
-                        cursorColor: Colors.white,
+                        cursorColor: Colors.black,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                         decoration: InputDecoration(
                           hintText: 'Search surveys',
                           hintStyle: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.78),
+                            color: Colors.black,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
                           prefixIcon: Icon(
                             Icons.search,
                             size: 18,
-                            color: Colors.white.withValues(alpha: 0.82),
+                            color: Colors.black,
                           ),
                           filled: true,
                           fillColor: Colors.white.withValues(alpha: 0.18),
@@ -1857,7 +1849,7 @@ class _WebSurveysHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: Colors.black,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -1867,7 +1859,7 @@ class _WebSurveysHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -1879,23 +1871,23 @@ class _WebSurveysHeader extends StatelessWidget {
             child: TextField(
               controller: searchController,
               onChanged: onSearchChanged,
-              cursorColor: Colors.white,
+              cursorColor: Colors.black,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
                 hintText: 'Search surveys',
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.75),
+                  color: Colors.black,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
                 prefixIcon: Icon(
                   Icons.search,
                   size: 18,
-                  color: Colors.white.withValues(alpha: 0.85),
+                  color: Colors.black,
                 ),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.16),

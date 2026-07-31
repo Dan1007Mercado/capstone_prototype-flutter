@@ -18,7 +18,7 @@ class WebSidebar extends StatelessWidget {
   static const Color _primary = Color(0xFF2563EB); // From Laravel prototype
   static const Color _bgLight = Color(0xFFF8FAFC);
   static const Color _textMain = Color(0xFF1E293B);
-  static const Color _textMuted = Color(0xFF64748B);
+  static const Color _textMuted = Colors.black;
 
   @override
   Widget build(BuildContext context) {

@@ -42,7 +42,7 @@ class WebTopbar extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFF153D4A),
+                          color: Colors.black,
                         ),
                       ),
                       const Spacer(),

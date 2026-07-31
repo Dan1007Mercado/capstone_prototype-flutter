@@ -46,7 +46,7 @@ class PageHeader extends StatelessWidget {
               child: Text(
                 title,
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
@@ -96,7 +96,7 @@ class _HeaderIconButton extends StatelessWidget {
         IconButton(
           onPressed: onPressed,
           tooltip: tooltip,
-          icon: Icon(icon, color: Colors.white, size: 22),
+          icon: Icon(icon, color: Colors.black, size: 22),
         ),
         if (badgeCount > 0)
           Positioned(
@@ -306,20 +306,27 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(RadiusTokens.xs),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 11,
-          letterSpacing: 0.3,
+    return Align(
+      alignment: Alignment.centerLeft,
+      widthFactor: 1,
+      heightFactor: 1,
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 72),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(RadiusTokens.xs),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w600,
+            fontSize: 11,
+            letterSpacing: 0.3,
+          ),
         ),
       ),
     );

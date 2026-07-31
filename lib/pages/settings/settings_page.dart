@@ -16,8 +16,8 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   static const Color _heroStart = Color(0xFF82E1E6);
   static const Color _heroEnd = Color(0xFF1FB9C1);
-  static const Color _brandDeep = Color(0xFF153D4A);
-  static const Color _mutedText = Color(0xFF7D8790);
+  static const Color _brandDeep = Colors.black;
+  static const Color _mutedText = Colors.black;
 
   // ─────────────────────────────────────────────────────────────────────
   // Web palette (mirrors Surveys / Analytics / Online Forms web layouts)
@@ -28,8 +28,8 @@ class _SettingsPageState extends State<SettingsPage> {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _border = Color(0xFFDDECEF);
 
   final _profileFormKey = GlobalKey<FormState>();
@@ -112,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   child: const Icon(
                     Icons.logout_rounded,
-                    color: Colors.white,
+                    color: Colors.black,
                     size: 28,
                   ),
                 ),
@@ -1208,7 +1208,7 @@ class _WebSettingsHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: const Color.fromARGB(255, 0, 0, 0),
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -1218,7 +1218,7 @@ class _WebSettingsHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.black,
                   ),
                 ),
               ],

@@ -128,8 +128,8 @@ class OmrPdfService {
         width: double.infinity,
         padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 3),
         decoration: pw.BoxDecoration(
-          border: pw.Border.all(width: 0.8, color: PdfColors.grey600),
-          color: PdfColors.grey100,
+          border: pw.Border.all(width: 0.8, color: PdfColors.grey300),
+          color: PdfColors.grey300,
         ),
         child: pw.Text(
           'Instructions: Fill the circle (●) completely. '
@@ -167,7 +167,7 @@ class OmrPdfService {
         height: _commentsHeight,
         padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 3),
         decoration: pw.BoxDecoration(
-          border: pw.Border.all(width: 0.8, color: PdfColors.grey600),
+          border: pw.Border.all(width: 0.8, color: PdfColors.grey300),
         ),
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -271,7 +271,7 @@ class OmrPdfService {
                   pw.Container(
                     width: 4,
                     height: 14,
-                    color: PdfColors.grey500,
+                    color: PdfColors.grey300,
                   ),
                   pw.Spacer(),
                   pw.SizedBox(
@@ -358,7 +358,7 @@ class OmrPdfService {
           bottom: pw.BorderSide(width: 1, color: PdfColors.black),
           top: pw.BorderSide(width: 1, color: PdfColors.black),
         ),
-        color: PdfColors.grey200,
+        color: PdfColors.grey300,
       ),
       child: pw.Text(
         title,

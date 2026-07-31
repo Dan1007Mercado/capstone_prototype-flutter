@@ -28,8 +28,8 @@ class OnlineFormsPage extends StatefulWidget {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _successGreen = Color(0xFF16A34A);
   static const Color _border = Color(0xFFDDECEF);
 
@@ -694,7 +694,7 @@ class _WebOnlineFormsHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: Colors.black,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -704,7 +704,7 @@ class _WebOnlineFormsHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.black,
                   ),
                 ),
               ],

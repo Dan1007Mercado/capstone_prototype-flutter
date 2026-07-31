@@ -29,8 +29,8 @@ class TemplatesPage extends StatelessWidget {
   static const Color _mintChipBg = Color(0xFFDFF5F3);
   static const Color _pageBg = Color(0xFFF4F7F8);
   static const Color _cardWhite = Color(0xFFFFFFFF);
-  static const Color _headingText = Color(0xFF0E2A2E);
-  static const Color _bodyText = Color(0xFF7C8A90);
+  static const Color _headingText = Colors.black;
+  static const Color _bodyText = Colors.black;
   static const Color _successGreen = Color(0xFF16A34A);
   static const Color _infoBlue = Color(0xFF2563EB);
   static const Color _pink = Color(0xFFDB2777);
@@ -115,14 +115,7 @@ class TemplatesPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 
-                                const SizedBox(height: 6),
-                                Text(
-                                  '${templateRows.length} reusable templates',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.92),
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                                
                                 const SizedBox(height: 14),
                                 Row(
                                   children: [
@@ -131,23 +124,23 @@ class TemplatesPage extends StatelessWidget {
                                         height: 42,
                                         child: TextField(
                                           onChanged: (_) {},
-                                          cursorColor: Colors.white,
+                                          cursorColor: Colors.black,
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: Colors.black,
                                             fontSize: 13,
                                             fontWeight: FontWeight.w600,
                                           ),
                                           decoration: InputDecoration(
                                             hintText: 'Search templates',
                                             hintStyle: TextStyle(
-                                              color: Colors.white.withValues(alpha: 0.78),
+                                              color: Colors.black,
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
                                             ),
                                             prefixIcon: Icon(
                                               Icons.search,
                                               size: 18,
-                                              color: Colors.white.withValues(alpha: 0.82),
+                                              color: Colors.black,
                                             ),
                                             filled: true,
                                             fillColor: Colors.white.withValues(alpha: 0.18),
@@ -720,17 +713,17 @@ class _WebTemplatesHeader extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: Colors.black,
                     letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$totalCount reusable templates',
+                  '',
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -741,23 +734,23 @@ class _WebTemplatesHeader extends StatelessWidget {
             height: 44,
             child: TextField(
               onChanged: (_) {},
-              cursorColor: Colors.white,
+              cursorColor: Colors.black,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
                 hintText: 'Search templates',
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.75),
+                  color: Colors.black,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
                 prefixIcon: Icon(
                   Icons.search,
                   size: 18,
-                  color: Colors.white.withValues(alpha: 0.85),
+                  color: Colors.black,
                 ),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.16),

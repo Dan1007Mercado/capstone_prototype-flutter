@@ -564,7 +564,7 @@ class _HorizontalBarChart extends StatelessWidget {
     if (points.isEmpty) {
       return const SizedBox(
         height: 36,
-        child: Center(child: Text('No response data available', style: TextStyle(fontSize: 12, color: Colors.grey))),
+        child: Center(child: Text('No response data available', style: TextStyle(fontSize: 12, color: Colors.black))),
       );
     }
     final maxVal = points.map((e) => e.value).reduce(math.max);
@@ -671,7 +671,7 @@ class _BarChart extends StatelessWidget {
     if (points.isEmpty) {
       return const SizedBox(
         height: 180,
-        child: Center(child: Text('No data available', style: TextStyle(fontSize: 12, color: Colors.grey))),
+        child: Center(child: Text('No data available', style: TextStyle(fontSize: 12, color: Colors.black))),
       );
     }
     final maxVal = points.map((e) => e.value).reduce(math.max);
